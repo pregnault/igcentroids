@@ -5,3 +5,4 @@
 ^draft/*$
 ^src/*$
 ^R/RcppExports.R$
+^\.github$
