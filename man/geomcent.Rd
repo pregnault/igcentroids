@@ -7,17 +7,21 @@
 geomcent(p, weight = NULL, base = exp(1))
 }
 \arguments{
-\item{p}{An \strong{R} object gathering a number \code{n} of objects of same nature. Currently, there is a method for \code{igcmatcatdist} matrix, i.e., a matrix of categorical distribution; see.}
+\item{p}{An \strong{R} object gathering a number \code{n} of objects of same nature.
+Currently, there is a method for \code{igcmatcatdist} matrix, i.e.,
+a matrix of categorical distribution.}
 
 \item{weight}{A positive vector of length \code{n}.}
 
-\item{base}{A positive value specifying the base of logarithm used for computing Jeffreys divergence. Default is exp(1) (natural logarithm).}
+\item{base}{A positive value specifying the base of logarithm used
+for computing Jeffreys divergence. Default is exp(1) (natural logarithm).}
 }
 \value{
 The geometric centroid of the input objects \code{p} weighted by \code{weight}.
 }
 \description{
-\code{geomcent()} is an S3 generic for computing the geometric mean of R objects, with methods for the following classes:
+\code{geomcent()} is an S3 generic for computing the geometric mean of R objects,
+with methods for the following classes:
 
 \itemize{
 \item \code{igcmatcatdist}

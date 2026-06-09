@@ -7,7 +7,9 @@
 arithcent(p, weight = NULL)
 }
 \arguments{
-\item{p}{An \strong{R} object gathering a number \code{n} of objects of same nature. Currently, there is a method for \code{igcmatcatdist} matrix, i.e., a matrix of categorical distribution; see.}
+\item{p}{An \strong{R} object gathering a number \code{n} of objects of same nature.
+Currently, there is a method for \code{igcmatcatdist} matrix, i.e.,
+a matrix of categorical distribution; see.}
 
 \item{weight}{A positive vector of length \code{n}.}
 }
@@ -15,7 +17,8 @@ arithcent(p, weight = NULL)
 The arithmetic centroid of the input objects \code{p} weighted by \code{weight}.
 }
 \description{
-\code{arithcent()} is an S3 generic for computing the arithmetic mean of R objects, with methods for the following classes:
+\code{arithcent()} is an S3 generic for computing the arithmetic mean of R objects,
+with methods for the following classes:
 
 \itemize{
 \item \code{igcmatcatdist}

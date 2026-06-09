@@ -6,7 +6,8 @@
 \alias{igccatdistn}
 \alias{igcmatcatdist}
 \alias{igcmatcatdistn}
-\title{Classes igccatdist, igccatdistn, igcmatcatdist, igcmatcatdistn for positive (normalized) vectors and matrices.}
+\title{Classes igccatdist, igccatdistn, igcmatcatdist, igcmatcatdistn
+for positive (normalized) vectors and matrices.}
 \usage{
 igccatdist(p = numeric())
 
@@ -17,20 +18,23 @@ igcmatcatdist(p = numeric())
 igcmatcatdistn(p = numeric())
 }
 \arguments{
-\item{p}{A numeric vector (for \code{igcatdist}, \code{igcatdistn}) or matrix (\code{igmatcatdist}, \code{igmatcatdistn}) of positive values.}
+\item{p}{A numeric vector (for \code{igcatdist}, \code{igcatdistn}) or
+matrix (\code{igmatcatdist}, \code{igmatcatdistn}) of positive values.}
 }
 \value{
 An object of the eponyme class.
 }
 \description{
-Classes igccatdist, igccatdistn, igcmatcatdist, igcmatcatdistn for positive (normalized) vectors and matrices.
+Classes igccatdist, igccatdistn, igcmatcatdist, igcmatcatdistn
+for positive (normalized) vectors and matrices.
 }
 \examples{
 igccatdist(c(0.3, 0.1, 0.4, 0.8))
 p <- igccatdistn(dbinom(0:4, size = 4, prob = 0.5))
 q <- igccatdistn(rep(1/5, times = 5))
 p+q
-igcmatcatdist(matrix(c(dbinom(0:4, size = 4, prob = 0.5), 1:5), nrow = 2, byrow = TRUE))
+igcmatcatdist(matrix(c(dbinom(0:4, size = 4, prob = 0.5), 1:5),
+                     nrow = 2, byrow = TRUE))
 matp <- matrix(c(dbinom(0:4, size = 4, prob = 0.5),
                  rep(1/5, times = 5)),
                nrow = 2, byrow = TRUE)

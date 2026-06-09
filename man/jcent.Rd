@@ -2,24 +2,31 @@
 % Please edit documentation in R/divergences_generic.R
 \name{jcent}
 \alias{jcent}
-\title{Jeffreys centroid of positive vectors and categorical probability distributions.}
+\title{Jeffreys centroid of positive vectors and
+categorical probability distributions.}
 \usage{
 jcent(p, weight = NULL, base = exp(1), ...)
 }
 \arguments{
-\item{p}{An object of classes \code{igcmatcatdist} or \code{igcmatcatdistn}, i.e., a positive or stochastic matrix (for the former, rows sum to one).}
+\item{p}{An object of classes \code{igcmatcatdist} or \code{igcmatcatdistn}, i.e.,
+a positive or stochastic matrix (for the former, rows sum to one).}
 
 \item{weight}{A vector of weights for the rows of \code{p}.}
 
-\item{base}{A positive value, the base of the logarithm to be used to compute Jeffreys divergence.}
+\item{base}{A positive value, the base of the logarithm to be used
+to compute Jeffreys divergence.}
 
 \item{...}{Additionnal arguments for other methods.}
 }
 \value{
-A positive vector (object of class \code{igccatdist}) if \code{p} is of class \code{igcmatcatdist} or a categorical probability distribution (object of class \code{igccatdistn}), approximation of the Jeffreys centroid of the rows of \code{p}.
+A positive vector (object of class \code{igccatdist}) if \code{p}
+is of class \code{igcmatcatdist} or a categorical probability distribution
+(object of class \code{igccatdistn}), approximation of the Jeffreys centroid
+of the rows of \code{p}.
 }
 \description{
-\code{jcent()} is an S3 generic for computing the arithmetic mean of R objects, with methods for the following classes:
+\code{jcent()} is an S3 generic for computing the arithmetic mean of R objects,
+with methods for the following classes:
 
 \itemize{
 \item \code{igcmatcatdist}
@@ -39,9 +46,12 @@ meths <- c("mag", "njc", "jfr", "bsa", "gbic")
 t(sapply(meths, function(m) jcent(p, method = m)))
 }
 \references{
-Nielsen, F. (2013). Jeffreys Centroids: A Closed-From Expresion for Positive Histograms and a Guaranteed Tight Approximation for Frequency Histograms.
+Nielsen, F. (2013). Jeffreys Centroids: A Closed-From Expresion for
+Positive Histograms and a Guaranteed Tight Approximation for
+Frequency Histograms.
 \emph{IEEE Signal Processing Letters}, \strong{20}(7), 657--660.
 
-Nielsen, F. (2024). Fast Proxy Centers for the Jeffreys Centroid: The Jeffreys-Fisher-Rado Center and the Gauss-Bregman Inductive Center.
+Nielsen, F. (2024). Fast Proxy Centers for the Jeffreys Centroid:
+The Jeffreys-Fisher-Rado Center and the Gauss-Bregman Inductive Center.
 \emph{Entropy}, \strong{26}, 1008-1037.
 }

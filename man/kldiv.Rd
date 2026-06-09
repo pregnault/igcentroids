@@ -7,7 +7,8 @@
 kldiv(p, q, base = exp(1))
 }
 \arguments{
-\item{p, q}{Two \strong{R} objects of same class. Currently, there is a method for \code{igccatdist} and \code{igccatdist} objects.}
+\item{p, q}{Two \strong{R} objects of same class. Currently,
+there is a method for \code{igccatdist} and \code{igccatdist} objects.}
 
 \item{base}{A positive value, the base in which logarithms are computed.}
 }
