@@ -1,0 +1,23 @@
+Package: igcentroids
+Title: Information geometry centroids for categorical distributions,
+    positive arrays and more
+Version: 0.0.0.001
+Authors@R: c(
+    person("Philippe", "Regnault", , "philippe.regnault@univ-reims.fr", role = c("cre", "aut"),
+           comment = c(ORCID = "0000-0002-7086-9030")),
+    person("Frank", "Nielsen", role = "aut",
+           comment = c(ORCID = "0000-0001-5728-0726"))
+  )
+Description: This package implements several approximation algorithms of the symmetric Kullback-Leibler centroid, also called symmetrical Kullback-Leibler centroid or symmetrized Kullback-Leibler centroid, or Jeffreys centroidc.
+License: GPL (>= 3)
+Encoding: UTF-8
+NeedsCompilation: yes
+URL: https://github.com/pregnault/igcentroids.git
+BugReports: https://github.com/pregnault/igcentroids/issues
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.1
+Imports: 
+    lamW (>= 2.2.7)
+Suggests:
+    testthat (>= 3.3.2)
+LinkingTo: Rcpp

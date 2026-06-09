@@ -1,0 +1,64 @@
+# Methods for computing divergences ----
+
+## KL divergence ----
+
+test_that("kldiv returns an error message if inputs p and q are not consistent", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:11)
+  expect_error(kldiv(p,q))
+})
+
+test_that("kldiv returns a single positive or null value when inputs are positive vectors of same size", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:10)
+  div <- kldiv(p,q)
+  expect_true(is.numeric(div) & length(div) == 1L)
+  expect_gte(div, 0)
+})
+
+test_that("kldiv returns log(N) - S(p) when inputs are a probability distribution and the uniform distribution", {
+  p <- igccatdistn(dbinom(0:4, size = 4, prob = 0.5))
+  q <- igccatdistn(rep(1/5, times = 5))
+  div <- kldiv(p,q)
+  expect_equal(div, log(5) + sum(p*log(p)))
+})
+
+test_that("kldiv with base different from exp(1) returns consistent results", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:10)
+  div1 <- kldiv(p,q)
+  div2 <- kldiv(p, q, base = 2)
+  expect_equal(div2, div1/log(2) + (sum(p) - sum(q))* (1/log(2) -1))
+})
+
+## Jeffreys divergence ----
+
+test_that("jdiv returns an error message if inputs p and q are not consistent", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:11)
+  expect_error(jdiv(p,q))
+})
+
+test_that("jdiv returns a single positive or null value when inputs are positive vectors of same size", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:10)
+  div <- jdiv(p,q)
+  expect_true(is.numeric(div) & length(div) == 1L)
+  expect_gte(div, 0)
+})
+
+test_that("jdiv is a symmetric functional", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:10)
+  divpq <- jdiv(p,q)
+  divqp <- jdiv(q,p)
+  expect_equal(divpq, divqp)
+})
+
+test_that("jdiv with base different from exp(1) returns consistent results", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:10)
+  div1 <- jdiv(p,q)
+  div2 <- jdiv(p, q, base = 2)
+  expect_equal(div2, div1/log(2))
+})
