@@ -264,10 +264,12 @@ jcent.igcmatcatdistn <- function(p, weight = NULL, base = exp(1),
     g <- geomcent.igcmatcatdist(p, weight = weight, base = base)
     g <- g / sum(g)
     iter <- 0
-    while (sum(abs(a - g)) > 2 * tol && iter < 1000) {
-      a <- (a + g) / 2
-      g <- sqrt(a * g)
-      g <- g / sum(g)
+    while (sum(abs(a - g)) > 2 * tol && iter < 10000) {
+      na <- (a + g) / 2
+      ng <- sqrt(a * g)
+      ng <- ng / sum(ng)
+      a <- na
+      g <- ng
       iter <- iter + 1
     }
     res <- a

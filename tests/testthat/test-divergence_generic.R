@@ -92,6 +92,26 @@ test_that("arithcent returns an object of class igccatdist with mass 1
   expect_equal(sum(arithcent(p)), 1)
 })
 
+test_that("Argument weight of arithcent is a positive vector", {
+  p <- igcmatcatdistn(matrix(c(dbinom(0:4, size = 4, prob = 0.5),
+                               dbinom(0:4, size = 4, prob = 0.3)),
+                             nrow = 2, byrow = TRUE))
+  weight <- c(-1, 1)
+  expect_error(arithcent(p, weight = weight))
+  weight <- 3
+  expect_error(arithcent(p, weight = weight))
+})
+
+test_that("Argument weight of arithcent is invariant by scalar multiplication", {
+  p <- igcmatcatdistn(matrix(c(dbinom(0:4, size = 4, prob = 0.5),
+                               dbinom(0:4, size = 4, prob = 0.3)),
+                             nrow = 2, byrow = TRUE))
+  weight1 <- c(2, 2)
+  weight2 <- c(10, 10)
+  expect_identical(arithcent(p, weight = weight1), arithcent(p, weight = weight2))
+})
+
+
 ## geometric centroid ----
 
 test_that("geomcent returns an error message if input is not an object
@@ -165,4 +185,17 @@ test_that("jcent method for igcmatcatdistn has a mandatory argument 'tol'
   expect_contains(class(jcent(p = p, tol = 1e-16)), "igccatdistn")
 })
 
+test_that("Approximations returned by jcent are quite similar", {
+  u <- rep(1/3, 3)
+  prob <- c(0.9, 0.05, 0.05)
+  p <- matrix(c(u, prob),
+              nrow = 2, ncol =3, byrow = TRUE)
+  p <- igcmatcatdistn(p)
+  # Available methods for computing approximated values of jeffreys centroid
+  meths <- c("mag", "njc", "jfr", "bsa", "gbic")
+  # Approximations obtained from these methods
+  jcents <- t(sapply(meths, function(m) jcent(p, method = m, tol = 1e-16)))
+  dist_jcents <- dist(jcents, method = "manhattan")
+  expect_all_true(dist_jcents < 1e-2)
+})
 
