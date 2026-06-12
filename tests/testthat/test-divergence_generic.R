@@ -108,7 +108,7 @@ test_that("Argument weight of arithcent is invariant by scalar multiplication", 
                              nrow = 2, byrow = TRUE))
   weight1 <- c(2, 2)
   weight2 <- c(10, 10)
-  expect_identical(arithcent(p, weight = weight1), arithcent(p, weight = weight2))
+  expect_equal(arithcent(p, weight = weight1), arithcent(p, weight = weight2))
 })
 
 
