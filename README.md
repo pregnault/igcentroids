@@ -10,7 +10,7 @@ Status: Active – The project has reached a stable, usable state and is
 being actively
 developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
 [![License: GPL
-v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![R-CMD-check](https://github.com/pregnault/igcentroids/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pregnault/igcentroids/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
@@ -43,9 +43,18 @@ prob <- c(0.9, 0.05, 0.05)
 p <- matrix(c(u, prob),
            nrow = 2, ncol =3, byrow = TRUE)
 p <- igcmatcatdistn(p)
+# Available methods for computing approximated values of jeffreys centroid
 meths <- c("mag", "njc", "jfr", "bsa", "gbic")
+# Approximations obtained from these methods
 t(sapply(meths, function(m) jcent(p, method = m)))
 ```
+
+    ##           [,1]      [,2]      [,3]
+    ## mag  0.6481447 0.1759276 0.1759276
+    ## njc  0.6468378 0.1765811 0.1765811
+    ## jfr  0.6484677 0.1757661 0.1757661
+    ## bsa  0.6484927 0.1757537 0.1757537
+    ## gbic 0.6484681 0.1757659 0.1757659
 
 ## Credits
 

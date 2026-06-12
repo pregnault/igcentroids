@@ -10,7 +10,7 @@ output: github_document
 
 ![](https://img.shields.io/badge/lifecycle-maturing-blue.svg)
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](http://www.repostatus.org/badges/latest/active.svg)](http://www.repostatus.org/#active)
-[![License: GPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![R-CMD-check](https://github.com/pregnault/igcentroids/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/pregnault/igcentroids/actions/workflows/R-CMD-check.yaml)
 
 <!-- badges: end -->
@@ -32,7 +32,7 @@ remotes::install_github("https://github.com/pregnault/igcentroids")
 
 Here is a first example, illustrating the five methods implemented for computing approximated centroids of probability distributions. 
 
-```{r example, eval=FALSE, echo = TRUE}
+```{r example, eval=TRUE, echo = TRUE}
 library(igcentroids)
 ## basic example code
 u <- rep(1/3, 3)
@@ -40,7 +40,9 @@ prob <- c(0.9, 0.05, 0.05)
 p <- matrix(c(u, prob),
            nrow = 2, ncol =3, byrow = TRUE)
 p <- igcmatcatdistn(p)
+# Available methods for computing approximated values of jeffreys centroid
 meths <- c("mag", "njc", "jfr", "bsa", "gbic")
+# Approximations obtained from these methods
 t(sapply(meths, function(m) jcent(p, method = m)))
 ```
 
