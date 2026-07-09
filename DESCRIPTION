@@ -15,9 +15,9 @@ NeedsCompilation: yes
 URL: https://github.com/pregnault/igcentroids.git
 BugReports: https://github.com/pregnault/igcentroids/issues
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
 Imports: 
     lamW (>= 2.2.7)
 Suggests:
     testthat (>= 3.3.2)
 LinkingTo: Rcpp
+Config/roxygen2/version: 8.0.0

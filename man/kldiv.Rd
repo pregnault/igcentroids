@@ -8,7 +8,7 @@ kldiv(p, q, base = exp(1))
 }
 \arguments{
 \item{p, q}{Two \strong{R} objects of same class. Currently,
-there is a method for \code{igccatdist} and \code{igccatdist} objects.}
+there is a method for \code{igccatdist} objects.}
 
 \item{base}{A positive value, the base in which logarithms are computed.}
 }
@@ -16,7 +16,7 @@ there is a method for \code{igccatdist} and \code{igccatdist} objects.}
 The value of the Kullback-Leibler divergence from \code{p} to \code{q}.
 }
 \description{
-Kullback-Leibler Divergence
+Compute the Kullback-Leibler divergence of a positive measure with respect to another dominating the first one.
 }
 \examples{
 p <- igccatdist(dbinom(0:4, size = 4, prob = 0.5))

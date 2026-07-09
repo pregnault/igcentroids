@@ -21,6 +21,7 @@ Useful links:
 
 Authors:
 \itemize{
+  \item Philippe Regnault \email{philippe.regnault@univ-reims.fr} (\href{https://orcid.org/0000-0002-7086-9030}{ORCID})
   \item Frank Nielsen (\href{https://orcid.org/0000-0001-5728-0726}{ORCID})
 }
 

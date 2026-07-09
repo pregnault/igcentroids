@@ -3,7 +3,7 @@
 # Desc.: Miscellanous functions used in package igcentroids.
 
 
-## Binary search ----
+# Binary search ----
 
 
 #' Binary search algorithm
@@ -61,3 +61,17 @@ binarysearch <- function(lb, ub, fun, tol = 1e-8) {
   err <- (uba - lba) / 2
   return(list(sol = res, prec = err, iter = cpt))
 }
+
+# Support functions for computing jensen-shannon centroids of categorical distributions ----
+
+## Gradient of the neg-entropy ----
+grad <- function(theta) {
+  return(log(theta / (1-sum(theta))))
+}
+
+## Inverse of the gradient of the neg-entropy ----
+invgrad <- function(eta) {
+  return(exp(eta)/(1+sum(exp(eta))))
+}
+
+

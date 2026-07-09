@@ -66,6 +66,68 @@ test_that("jdiv with base different from exp(1) returns consistent results", {
   expect_equal(div2, div1 / log(2))
 })
 
+## Jensen-Shannon divergence ----
+
+test_that("jsdiv returns an error message if inputs p and q are not consistent", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:11)
+  expect_error(jsdiv(p, q))
+})
+
+test_that("jsdiv returns a single positive or null value when
+            inputs are positive vectors of same size", {
+              p <- igccatdist(1:5)
+              q <- igccatdist(6:10)
+              div <- jsdiv(p, q)
+              expect_true(is.numeric(div) & length(div) == 1L)
+              expect_gte(div, 0)
+            })
+
+test_that("jsdiv is a symmetric functional", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:10)
+  divpq <- jsdiv(p, q)
+  divqp <- jsdiv(q, p)
+  expect_equal(divpq, divqp)
+})
+
+test_that("jsdiv with base different from exp(1) returns consistent results", {
+  p <- igccatdist(1:5)
+  q <- igccatdist(6:10)
+  div1 <- jsdiv(p, q)
+  div2 <- jsdiv(p, q, base = 2)
+  expect_equal(div2, div1 / log(2))
+})
+
+
+test_that("jsdiv returns values between 0 and log(2).", {
+  set.seed(847)
+  p <- matrix(sample(1:10, size = 500, replace = TRUE),
+              nrow = 100, ncol = 5)
+  p <- t(apply(p, 1, function(row) row / sum(row)))
+  q <- matrix(sample(1:10, size = 500, replace = TRUE),
+              nrow = 100, ncol = 5)
+  q <- t(apply(q, 1, function(row) row / sum(row)))
+  divs <- sapply(1:nrow(p), function(idrow) jsdiv(igccatdist(p[idrow,]), igccatdist(q[idrow,])))
+  expect_all_true(divs >= 0 & divs <= log(2))
+})
+
+test_that("jsdiv equals the difference between the entropy of the mixture and the average of entropies.", {
+  set.seed(847)
+  p <- matrix(sample(1:10, size = 500, replace = TRUE),
+              nrow = 100, ncol = 5)
+  p <- t(apply(p, 1, function(row) row / sum(row)))
+  q <- matrix(sample(1:10, size = 500, replace = TRUE),
+              nrow = 100, ncol = 5)
+  q <- t(apply(q, 1, function(row) row / sum(row)))
+  divs <- sapply(1:nrow(p), function(idrow) jsdiv(igccatdist(p[idrow,]), igccatdist(q[idrow,])))
+  entsp <- sapply(1:nrow(p), function(idrow) -sum(p[idrow,]*log(p[idrow,])))
+  entsq <- sapply(1:nrow(q), function(idrow) -sum(q[idrow,]*log(q[idrow,])))
+  entsmix <- sapply(1:nrow(p), function(idrow) -sum((p[idrow,]*0.5+q[idrow,]*0.5)*log((p[idrow,]*0.5+q[idrow,]*0.5))))
+  divsalt <- entsmix - entsp*0.5 - entsq*0.5
+  expect_true(all.equal(divs, divsalt))
+})
+
 # Methods for computing centroids ----
 
 ## Arithmetic centroid ----
@@ -197,5 +259,90 @@ test_that("Approximations returned by jcent are quite similar", {
   jcents <- t(sapply(meths, function(m) jcent(p, method = m, tol = 1e-16)))
   dist_jcents <- dist(jcents, method = "manhattan")
   expect_all_true(dist_jcents < 1e-2)
+})
+
+## Jensen-Shannon centroid ----
+
+test_that("jscent returns an error message if input is not an object
+          of class igcmatcatdistn", {
+            p <- matrix(1:6, nrow = 2)
+            expect_error(jscent(p))
+            p <- igccatdist(1:6)
+            expect_error(jscent(p))
+            p <- igcmatcatdist(matrix(1:6, nrow = 2))
+            expect_error(jscent(p))
+          })
+
+test_that("jscent returns an object of class igccatdistn if input is
+          of class icgmatcatdistn, with adequate length", {
+            p <- igcmatcatdistn(matrix(c(dbinom(0:4, size = 4, prob = 0.5),
+                                         dbinom(0:4, size = 4, prob = 0.3)),
+                                       nrow = 2, byrow = TRUE))
+            expect_identical(class(jscent(p)), c("igccatdistn", "igccatdist"))
+            expect_true(length(jscent(p)) == ncol(p))
+          })
+
+test_that("jscent method for igcmatcatdistn has a mandatory argument 'tol'
+          which is expected to be a numeric value", {
+            p <- igcmatcatdistn(matrix(c(dbinom(0:4, size = 4, prob = 0.5),
+                                         dbinom(0:4, size = 4, prob = 0.3)),
+                                       nrow = 2, byrow = TRUE))
+            expect_error(jscent(p = p, tol = NULL))
+            expect_contains(class(jscent(p = p, tol = 1e-16)), "igccatdistn")
+          })
+
+# Plot methods ----
+
+## Plot objects of class igcmatcatdistn ----
+
+test_that("Method plot for class igcmatcatdistn unable to perform plot
+          for matrices with only one column", {
+  p <- igcmatcatdistn(matrix(rep(1, 10L), nrow = 10L))
+  expect_error(plot(p))
+})
+
+test_that("Method plot for class igcmatcatdistn returns invisibly an object", {
+  set.seed(987)
+  p <- igcmatcatdistn(matrix(sample(1:10, size = 20L, replace = TRUE), nrow = 10L))
+  expect_invisible(plot(p))
+  p <- igcmatcatdistn(matrix(sample(1:10, size = 30L, replace = TRUE), nrow = 10L))
+  expect_invisible(plot(p))
+  p <- igcmatcatdistn(matrix(sample(1:10, size = 40L, replace = TRUE), nrow = 10L))
+  expect_invisible(plot(p))
+})
+
+test_that("Two-state categorical distributions are drawn as points on a segment", {
+  set.seed(987)
+  p <- igcmatcatdistn(matrix(sample(1:10, size = 20L, replace = TRUE), nrow = 10L))
+  res_plot <- plot(p)
+  expect_match(tolower(res_plot$type), regexp = "segment")
+})
+
+test_that("Three-state categorical distributions are drawn as points in an equilateral triangle", {
+  set.seed(987)
+  p <- igcmatcatdistn(matrix(sample(1:10, size = 30L, replace = TRUE), nrow = 10L))
+  res_plot <- plot(p)
+  expect_match(tolower(res_plot$type), regexp = "triangle")
+})
+
+test_that("Three-state categorical distributions are properly transformed
+          into coordinates in the equilateral triangle", {
+  set.seed(987)
+  matp <- matrix(c(1/3, 1/3, 1/3,
+                   0.9, 0.05, 0.05,
+                   0.1, 0.45, 0.45,
+                   0.6, 0.25, 0.15),
+                 nrow = 4L, byrow = TRUE)
+  p <- igcmatcatdistn(matp)
+  res_plot <- plot(p)
+  correct_coords <- t(matrix(c(1, 0, 1/2, sqrt(3)/2), ncol = 2) %*% t(matp[, 1:2, drop = FALSE]))
+  expect_true(all.equal(res_plot$coords, correct_coords))
+})
+
+test_that("Categorical distributions with more than three states are drawn as polylines.", {
+  set.seed(987)
+  p <- igcmatcatdistn(matrix(sample(1:10, size = 50L, replace = TRUE), nrow = 10L))
+  res_plot <- plot(p)
+  expect_match(tolower(res_plot$type), regexp = "polyline")
 })
 

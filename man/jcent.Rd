@@ -25,12 +25,12 @@ is of class \code{igcmatcatdist} or a categorical probability distribution
 of the rows of \code{p}.
 }
 \description{
-\code{jcent()} is an S3 generic for computing the arithmetic mean of R objects,
+\code{jcent()} is an S3 generic for computing the Jeffreys centroid of R objects,
 with methods for the following classes:
 
 \itemize{
 \item \code{igcmatcatdist}
-\item \code{igcmatcatdistn}
+\item \code{\link[=jcent.igcmatcatdistn]{igcmatcatdistn}}
 }
 }
 \details{
@@ -50,8 +50,13 @@ Nielsen, F. (2013). Jeffreys Centroids: A Closed-From Expresion for
 Positive Histograms and a Guaranteed Tight Approximation for
 Frequency Histograms.
 \emph{IEEE Signal Processing Letters}, \strong{20}(7), 657--660.
+\href{https://ieeexplore.ieee.org/document/6509930}{doi:10.1109/LSP.2013.2260538}
 
 Nielsen, F. (2024). Fast Proxy Centers for the Jeffreys Centroid:
 The Jeffreys-Fisher-Rado Center and the Gauss-Bregman Inductive Center.
 \emph{Entropy}, \strong{26}, 1008-1037.
+\href{https://www.mdpi.com/1099-4300/26/12/1008}{doi:10.3390/e26121008}
+}
+\seealso{
+\code{\link[=arithcent]{arithcent()}}, \code{\link[=geomcent]{geomcent()}}, \code{\link[=jscent]{jscent()}}, \code{\link[lamW:lambertW0]{lamW::lambertW0()}}
 }

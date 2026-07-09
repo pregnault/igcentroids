@@ -8,7 +8,7 @@ jdiv(p, q, base = exp(1))
 }
 \arguments{
 \item{p, q}{Two \strong{R} objects of same class. Currently, there is a method for
-\code{igccatdist} and \code{igccatdist} objects.}
+\code{igccatdist} objects.}
 
 \item{base}{A positive value specifying the base of logarithm used for
 computing Jeffreys divergence. Default is exp(1) (natural logarithm).}
@@ -18,10 +18,14 @@ The value of the Jeffreys divergence (or symmetrized Kullback-Leibler)
 from \code{p} to \code{q}.
 }
 \description{
-Jeffreys Divergence
+Compute the Jeffreys divergence between two positive mesasures with same support i.e.,
+the symmetrization of Kullback-Leibler divergence.
 }
 \examples{
 p <- igccatdist(dbinom(0:4, size = 4, prob = 0.5))
 q <- igccatdist(rep(1/5, times = 5))
 jdiv(p, q)
+}
+\seealso{
+\code{\link[=kldiv]{kldiv()}}, \code{\link[=jsdiv]{jsdiv()}}
 }

@@ -34,3 +34,6 @@ matp <- matrix(c(p, q), nrow = 2)
 matptest <- igcmatcatdist(p = matp)
 geomcent(p = matptest)
 }
+\seealso{
+\code{\link[=arithcent]{arithcent()}}, \code{\link[=jcent]{jcent()}}, \code{\link[=jscent]{jscent()}}
+}
