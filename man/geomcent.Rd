@@ -2,7 +2,7 @@
 % Please edit documentation in R/divergences_generic.R
 \name{geomcent}
 \alias{geomcent}
-\title{Geometrix centroid of n objects}
+\title{Geometric centroid of n objects}
 \usage{
 geomcent(p, weight = NULL, base = exp(1))
 }
@@ -11,7 +11,9 @@ geomcent(p, weight = NULL, base = exp(1))
 Currently, there is a method for \code{igcmatcatdist} matrix, i.e.,
 a matrix of categorical distribution.}
 
-\item{weight}{A positive vector of length \code{n}.}
+\item{weight}{A positive vector of length \code{n}.
+The geometric mean is balanced by weighting each row of \code{p} with
+the corresponding element of \code{weight}.}
 
 \item{base}{A positive value specifying the base of logarithm used
 for computing Jeffreys divergence. Default is exp(1) (natural logarithm).}
@@ -35,5 +37,5 @@ matptest <- igcmatcatdist(p = matp)
 geomcent(p = matptest)
 }
 \seealso{
-\code{\link[=arithcent]{arithcent()}}, \code{\link[=jcent]{jcent()}}, \code{\link[=jscent]{jscent()}}
+\code{\link[=arithcent]{arithcent()}}, \code{\link[=jcent]{jcent()}}, \code{\link[=jscent]{jscent()}}, \link{catdist}.
 }

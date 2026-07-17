@@ -8,14 +8,15 @@
 
 #' Binary search algorithm
 #'
-#' An R implementation of the binary search of the zero of a
+#' An **R** implementation of the binary search of the zero of a
 #' continous strictly monotone real function.
 #'
 #' @param lb A single numeric value, the lower bound of the interval to seek in the zero point.
 #' @param ub A single numeric value, the upper bound of the interval to seek in the zero point.
 #' @param fun A continuous monotone real function defined on the interval
-#' `[lb, up]` such that `fun(lb)*fun(up) < 0`.
+#' `[lb, ub]` such that `fun(lb)*fun(ub) < 0`.
 #' @param tol The precision of the approximation of the zero point to be attained.
+#' Default value is `1e-8`.
 #'
 #' @returns A list with three components :
 #'  - `sol`, the approximation of the zero point for function `fun` ;
@@ -74,4 +75,82 @@ invgrad <- function(eta) {
   return(exp(eta)/(1+sum(exp(eta))))
 }
 
+# Integration into flexclust workflow ----
 
+#' @name fcwintegration
+#' @rdname fcwintegration
+#'
+#' @title Wrapped-up functions for seemless-integration in `{flexclust}` workflow.
+#' @description
+#' Functions `preproc_igc()`, `jdivflex()`, `jcentlex()`, `jsdivflex()`and `jscentlex()`
+#' are intended to ease `igcentroids` integration into clustering workflow with `{flexclust}`.
+#' @param p An object of class `igmatcatdistn`.
+#' @param x A positive matrix.
+#' @param weight A positive vector of length `n`.
+#' The arithmetic mean is balanced by weighting each row of `p` with
+#' the corresponding element of `weight`.
+#' @param base A positive value, the base in which logarithms are computed.
+#' @param method A character string specifying
+#' the method to be used for computing the approximation of Jeffreys centroid. See [jcent.igcmatcatdistn()] for details.
+#' @param centers A positive matrix whose rows are the (temporary) centers of clusters.
+#' @seealso [flexclust::kccaFamily()]
+#' @returns Objects suitable for defining a clustering family with `flexclust::kccaFamily()`.
+NULL
+
+#' @rdname fcwintegration
+#' @export
+#' @examples
+#' # Create an object of class igcmatcatdistn
+#' p <- igccatdist(dbinom(0:4, size = 4, prob = 0.5))
+#' q <- igccatdist(rep(1/5, times = 5))
+#' r <- igccatdist(c(0.3, 0.4, 0.1, 0.1, 0.1))
+#' matp <- rbind(p, q, r)
+#' matptest <- igcmatcatdistn(p = matp)
+#' # Avoid class so as to return an object of type matrix
+#' undo_igc(matptest)
+undo_igc <- function(p) {
+  if (! any(grepl(pattern = "igc", class(p)))) {
+    stop("p must be an object of class igccatdist, igccatdistn, igcmatcatdist or igcmatcatdistn.")
+  }
+  res <- p
+  attr(res, "class") <- NULL
+  attr(res, "mass") <- NULL
+  return(res)
+}
+
+#' @rdname fcwintegration
+#' @export
+#' @examples
+#' # Compute Jeffreys divergences from a matrix as returned by undo_igc()
+#' center <- matrix(rep(1/5, times = 5), nrow = 1)
+#' jdivflex(x = matp, centers = center)
+jdivflex <- function(x, centers, base = exp(1)) {
+  jdiv(p = igcmatcatdistn(x), q = igcmatcatdistn(centers), base = base)
+}
+
+#' @rdname fcwintegration
+#' @export
+#' @examples
+#' # Compute Jeffreys centroid from a matrix as returned by undo_igc()
+#' jcentflex(x = matp)
+jcentflex <- function(x, weight = NULL, method = "gbic", base = exp(1)) {
+  jcent(p = igcmatcatdistn(x), weight = weight, method = method, base = base)
+}
+
+#' @rdname fcwintegration
+#' @export
+#' @examples
+#' # Compute Jensen-Shannon divergences from a matrix as returned by undo_igc()
+#' jsdivflex(x = matp, centers = center)
+jsdivflex <- function(x, centers, base = exp(1)) {
+  jsdiv(p = igcmatcatdistn(x), q = igcmatcatdistn(centers), base = base)
+}
+
+#' @rdname fcwintegration
+#' @export
+#' @examples
+#' # Compute Jensen-Shannon centroid from a matrix as returned by undo_igc()
+#' jscentflex(x = matp)
+jscentflex <- function(x, weight = NULL, method = "gbic", base = exp(1)) {
+  jscent(p = igcmatcatdistn(x), weight = weight, method = method, base = base)
+}

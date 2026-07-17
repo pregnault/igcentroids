@@ -12,9 +12,10 @@ binarysearch(lb, ub, fun, tol = 1e-08)
 \item{ub}{A single numeric value, the upper bound of the interval to seek in the zero point.}
 
 \item{fun}{A continuous monotone real function defined on the interval
-\verb{[lb, up]} such that \code{fun(lb)*fun(up) < 0}.}
+\verb{[lb, ub]} such that \code{fun(lb)*fun(ub) < 0}.}
 
-\item{tol}{The precision of the approximation of the zero point to be attained.}
+\item{tol}{The precision of the approximation of the zero point to be attained.
+Default value is \code{1e-8}.}
 }
 \value{
 A list with three components :
@@ -25,7 +26,7 @@ A list with three components :
 }
 }
 \description{
-An R implementation of the binary search of the zero of a
+An \strong{R} implementation of the binary search of the zero of a
 continous strictly monotone real function.
 }
 \examples{

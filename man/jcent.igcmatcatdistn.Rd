@@ -4,7 +4,7 @@
 \alias{jcent.igcmatcatdistn}
 \title{Compute Jeffreys centroids of a set of normalized categorical distributions.}
 \usage{
-\method{jcent}{igcmatcatdistn}(p, weight = NULL, base = exp(1), method = "bsa", tol = 1e-08, ...)
+\method{jcent}{igcmatcatdistn}(p, weight = NULL, base = exp(1), method = "gbic", tol = 1e-08, ...)
 }
 \arguments{
 \item{p}{An object of classes \code{igcmatcatdist} or \code{igcmatcatdistn}, i.e.,
@@ -25,7 +25,7 @@ Possible values are:
 and normalized geometric centroids;
 \item "bsa" for a single-value binary search alogrithm based on Lagrangian optimization;
 \item "gbic" for the Gauss-Bregman inductive centroid.
-Default is "bsa". See Details section.
+Default is "gbic". See Details section.
 }}
 
 \item{tol}{For \code{igcmatcatdistn} objects only. A positive value,
@@ -35,6 +35,47 @@ the tolerance in the approximation of Jeffreys centroid. Default is 1e-8.}
 }
 \description{
 Method for the generic \code{jcent()} and the class \code{igcmatcatdistn}.
+}
+\details{
+Let \eqn{p_1, \cdots, p_n} denote the rows of \code{p} and
+\eqn{w_1, \cdots, w_n} the components of the vector \code{weight}.
+The output of \code{jcent()} is a numerical approximation of the
+probability distribution \eqn{p^*} (object of class \code{igccatdistn}) satisfying
+\deqn{p^* \in \textrm{Argmin} \left\{ \sum_{i=1}^n w_i \mathbb{J}(p_i:q) \ | \  q >= 0 \sum_{x} q(x) =1 \right\},}
+where \eqn{\mathbb{J}((p_i:q)} denotes the Jeffreys divergence between \eqn{p_i} and \eqn{q}.
+Nielsen (2013) establishes using Lagrangian multipliers method that \eqn{p^*} is of the form
+\deqn{p^*(x) = \frac{a(x)}{W( \exp( \log(b) (\lambda + 1)  a(x)/g(x)))},}
+where \eqn{W} denotes the Lambert function,
+\eqn{a = \sum w_i p_i} is the arithmetic centroid of the vectors \eqn{p_i},
+\eqn{g = \prod p_i^{w_i}} is their geometric centroid,
+\eqn{b >0} is the logarithm basis used to compute the Jeffreys divergence  and
+\eqn{\lambda} is the unique real number such that
+\deqn{\mathbb{K}(p^* | g) = - \lambda.}
+There is no known closed-form expression for \eqn{\lambda}.
+
+The argument \code{method} identifies the method to be used to compute a numerical approximation
+of \eqn{\lambda} or directly of \eqn{p^*}. More precisely, if:
+\itemize{
+\item \code{method = "bsa"}, a numerical approximation of \eqn{\lambda} satisfying the last equation
+is computed thanks to a binary search.
+The argument \code{tol} refers to the numerical tolerance for this approximation.
+Then, the corresponding probability distribution \eqn{p^*} is computed.
+Due to the computational cost of evaluating the Lambert function,
+this method can be timec-consuming,
+particularly when the state space (i.e., the number of columns of \code{p}) is large;
+\item \code{method = "gbic"}, an iterative procedure called Gauss-Bregman inductive center
+is performed; see Nielsen (2024).
+It consists in iteratively computing arithmetic and geometric means
+of centroids until convergence. It is by far computationally less expansive than "bsa",
+with a similar quality of approximation.
+Its excellent performances make it the default method used by \code{jcent()};
+\item \code{method = "mag"}, the mean \eqn{(a+g)/2} of the arithmetic and geometric centroids is returned;
+it corresponds to the first iteration of "gbic";
+\item \code{method = "jfr"}, the Fisher-Rao midpoint of
+the arithmetic and geometric centroids is returned, i.e.,
+the normalized version of \eqn{(\sqrt{a} +\sqrt{g})^2};
+\item \code{method = "njc"}, the normalized version of the positive vector Jeffreys centroid is returned.
+}
 }
 \examples{
 u <- rep(1/3, 3)
@@ -58,5 +99,5 @@ The Jeffreys-Fisher-Rado Center and the Gauss-Bregman Inductive Center.
 \href{https://www.mdpi.com/1099-4300/26/12/1008}{doi:10.3390/e26121008}
 }
 \seealso{
-Generic function \code{\link[=jcent]{jcent()}}
+Generic function \code{\link[=jcent]{jcent()}}, \code{\link[=jscent]{jscent()}} for computing Jensen-Shannon centroids
 }

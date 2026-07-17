@@ -9,9 +9,11 @@ arithcent(p, weight = NULL)
 \arguments{
 \item{p}{An \strong{R} object gathering a number \code{n} of objects of same nature.
 Currently, there is a method for \code{igcmatcatdist} matrix, i.e.,
-a matrix of categorical distribution; see.}
+a matrix of categorical distribution; see \link{catdist}.}
 
-\item{weight}{A positive vector of length \code{n}.}
+\item{weight}{A positive vector of length \code{n}.
+The arithmetic mean is balanced by weighting each row of \code{p} with
+the corresponding element of \code{weight}.}
 }
 \value{
 The arithmetic centroid of the input objects \code{p} weighted by \code{weight}.
@@ -32,5 +34,5 @@ matptest <- igcmatcatdist(p = matp)
 arithcent(p = matptest)
 }
 \seealso{
-\code{\link[=geomcent]{geomcent()}}, \code{\link[=jcent]{jcent()}}, \code{\link[=jscent]{jscent()}}
+\code{\link[=geomcent]{geomcent()}}, \code{\link[=jcent]{jcent()}}, \code{\link[=jscent]{jscent()}}, \link{catdist}.
 }

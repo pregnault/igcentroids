@@ -3,12 +3,15 @@
 \name{plot.igcmatcatdistn}
 \alias{plot.igcmatcatdistn}
 \alias{points.igcmatcatdistn}
+\alias{plot.igccatdistn}
 \alias{points.igccatdistn}
 \title{Scatter plot of normalized categorical  distributions}
 \usage{
 \method{plot}{igcmatcatdistn}(x, y = NULL, add = FALSE, pch = 20, ...)
 
 \method{points}{igcmatcatdistn}(x, y = NULL, ...)
+
+\method{plot}{igccatdistn}(x, y = NULL, ...)
 
 \method{points}{igccatdistn}(x, y = NULL, ...)
 }
@@ -74,6 +77,9 @@ y <- matrix(c(0.7, 0.15, 0.15,
               nrow = 2, ncol = 3, byrow = TRUE)
 y <- igcmatcatdistn(y)
 points(y, pch = 3)
+p <- sample(1:10, size = 10L, replace = TRUE)
+p <- igccatdistn(p/sum(p))
+plot(p)
 u <- rep(1/3, 3)
 prob <- c(0.99, 0.005, 0.005)
 x <- matrix(c(u, prob),

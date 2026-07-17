@@ -49,5 +49,5 @@ and the Jensen-Shannon Centroid.
 \href{https://www.mdpi.com/1099-4300/22/2/221}{doi:10.3390/e22020221}
 }
 \seealso{
-\code{\link[=arithcent]{arithcent()}}, \code{\link[=geomcent]{geomcent()}}, \code{\link[=jcent]{jcent()}}
+\code{\link[=arithcent]{arithcent()}}, \code{\link[=geomcent]{geomcent()}}, \code{\link[=jcent]{jcent()}}, \link{catdist}.
 }

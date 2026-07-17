@@ -1,0 +1,131 @@
+---
+title: "Informational geometrical centroids of categorical distributions"
+vignette: >
+  %\VignetteIndexEntry{catdist_centroids_tutorial}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+# bibliography: bib_vignette_catdist_igcentroids.bib
+---
+
+This tutorial is intended to assist the user in getting started with calculating centroids of discrete probability distributions relative to the Jeffreys and Jensen-Shannon divergences with the package `{igcentroids}` and integrating these computation in a clustering-task workflow. 
+It starts with a short, technical presentation of the underlying S3 classes of R objects the package is built upon, in @sec-vig_catdist_presclasses. The informational geometric theoretical foundation of the ensueing procedures is outlined in Setions [-@sec-vig_catdist_presdivergences] and [-@sec-vig_catdist_prescentroids]. More precisely, the definitions and properties of Kullback-Leibler (KL), Jeffreys (J) and Jensen-Shannon (JS) divergences (div) and related centroids are reviewed; the usage of methods for computing them is also illustrated. 
+These procedures fully integrate into a clustering-task workflow performed with the package `{flexclust}`, as illustrated in @sec-vig_catdist_clustering. Finally, full examples of such clustering tasks are presented in @sec-vig_catdist_fullexamples.
+
+As a preliminary step, load the package `{igcentroids}`, as follows.
+
+```{r}
+#| label: setup
+library(igcentroids)
+```
+
+It is implicitly assumed that the package `{igcentroids}` has been previously installed; if not, please, refer to the [README](https://github.com/pregnault/igcentroids) file on top of the repository of the package.
+
+
+## S3 classes `igccatdist`, `igccatdistn`, `igcmatcatdist` and `igcmatcatdistn` {#ssec-vig_catdist_presclasses}
+
+`{igcentroids}` provides several procedures for clustering categorical -- or finite-state space -- (probability) distributions with same support. 
+
+We formally denote $\mathcal{P}(\mathcal{X})$ the set of positive measures -- or categorical distributions -- on the finite set $\mathcal{X} = \{x_1, \cdots, x_d\}$. Such a measure $\mu$ is mathematically identifiable to the vector $(\mu(x_1), \cdots, \mu(x_d)) \in \mathbb{R}^d$ with  $\mu(x_i) >0$  for all $i \i \{1, \cdots, d\}$; it is represented in `{igcentroids}` as an object of S3 class `igccatdist` built upon classical numeric vectors. Such an object is obtained as the output of the eponyme constructor function `igccatdist()`, taking a positive numeric vector as input.
+
+```{r}
+#| label: creating_igccatdist_object
+set.seed(679)
+# A positive measure on a 5-state space
+p <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+```
+
+`igccatdist` objects are positive numeric vectors with two attributes `class` and `mass`. The first one is obviously `"igccatdist"` while the second is the mass of the whole set of states i.e., the sum of the components of the vector. Both attributes are displayed when the object is printed.
+
+```{r}
+#| label: printing_igccatdist_object
+print(p)
+```
+
+Note that a validation function prevents the user to convert into `igccatdist` non-positive vectors.
+
+```{r}
+#| label: error_non-positive_entries_igccatdist
+#| error: true 
+igccatdist(c(1, 0))
+igccatdist(-(1:3))
+```
+
+The subset $\mathcal{P}_1(\mathcal{X}) \subset \mathcal{P}(\mathcal{X})$ of positive measures with mass equal to one is of foundamental interest in any field related to probability theory. Its elements are probability measures, called here normalized categorical distributions; they are represented in `{igcentroids}` as objects of class `igccatdistn`, unformally inheriting from `igccatdist`. 
+
+```{r}
+#| label: creating_igccatdistn_object
+# The binomial distribution of parameters n = 4 and p = 0.5 as an igccatdist object
+q <- igccatdistn(dbinom(x = 0:4, size = 4L, prob = 0.5))
+print(q)
+# Normalize a positive vecto priori to convert it to igccatdistn
+igccatdistn(p/sum(p))
+```
+
+Sets of (normalized) categorical distributions on the same support are represented as positive matrices -- stochastic matrices for normalized categorical distributions; dedicated classes are introduced in `{igcentroids}` : `igcmatcatdist` and `igcmatcatdistn`.
+
+```{r}
+#| label: creating_igcmatcatdist
+matcd <- matrix(c(p, q), nrow = 2, byrow = TRUE)
+igcmatcatdist(matcd)
+matncd <- matrix(c(p/sum(p), q), nrow = 2, byrow = TRUE)
+igcmatcatdistn(matncd)
+```
+
+Methods for generics plot() and points() associated to `igccatdistn` and `igcmatcatdistn` are available. Their behaviour depends on the size $|\mathcal{X}|$ of the support $\mathcal{X}$. More precisely, Two-state and three-state supports benefit of particular representations, for mere of pedagogical purpose, as illustrated by Figures [-@fig-23statencdplot-1] and [-@fig-23statencdplot-2].
+
+```{r}
+#| layout-ncol: 2
+#| label: fig-23statencdplot
+#| fig-cap: Examples of representations of normalized categorical distributions obtained with the methods `plot()` and `points()` for `igcmatcatdistn` objects.
+#| fig-subcap:
+#|   - Two-state ncds are represented as points on a unite segment.
+#|   - Three-state ncds are represented as points in the 2D simplex identified to the equilateral triangle.
+# Two-state  categorical distributions plot
+u <- c(0.5, 0.5)
+p1 <- c(0.3, 0.7)
+p2 <- c(0.4, 0.6)
+x <- igcmatcatdistn(matrix(c(u, p1, p2),
+                     nrow = 3, ncol = 2, byrow = TRUE))
+plot(x)
+# Three-state categorical distributions plot
+runifsimplex <- function(n = 1L) {
+  x <- runif(n)
+  y <- runif(n, min = 0, max = 1-x)
+  res <- igcmatcatdistn(matrix(c(x,y, 1-x-y), ncol = 3, byrow = FALSE))
+  return(res)
+}
+set.seed(527)
+sampsimp <- runifsimplex(n = 32L)
+plot(sampsimp)
+```
+
+Nprmalized categorical distributions with bigger state spaces are represented as polylines i.e., continuous piecewise linear functions linking the top of bars in a classical barplot; see @fig-plotbigstatespacencd.
+
+```{r}
+#| label: fig-plotbigstatespacencd
+#| fig-cap: To be continued
+p <- sample(1:10, size = 10L, replace = TRUE)
+p <- igccatdistn(p/sum(p))
+plot(p)
+```
+
+
+
+## Computing divergences of a couple of categorical distributions {#sec-vig_catdist_presdivergences}
+
+## Computing centroids of a set of categorical distributions {#sec-vig_catdist_prescentroids}
+
+## Clustering categorical distributions {#sec-vig_catdist_clustering}
+
+## Full examples {#sec-vig_catdist_fullexamples}
+
+Categorical distributions, normalized or not, can be used to summarize a large variety of types of data, including categorical traits of sub-groups of a population, colors or gray intensities of pixels or voxels of 2D or 3D images, semantic contents of texts, etc. AJOUTER REFS. 
+
+
+## References {-}
+
+

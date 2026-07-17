@@ -25,8 +25,9 @@ matrix (\code{igmatcatdist}, \code{igmatcatdistn}) of positive values.}
 An object of the eponyme class.
 }
 \description{
-Classes igccatdist, igccatdistn, igcmatcatdist, igcmatcatdistn
-for positive (normalized) vectors and matrices.
+\code{igccatdist}, \code{igccatdistn}, \code{igcmatcatdist}, \code{igcmatcatdistn} are
+S3 classes for, respectively, positive vectors, probability distributions,
+positive matrices and stochastic matrices (positive matrices whose rows sum to one).
 }
 \examples{
 igccatdist(c(0.3, 0.1, 0.4, 0.8))

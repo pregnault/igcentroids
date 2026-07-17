@@ -109,6 +109,10 @@ validate_igcmatcatdistn <- function(p) {
 #'
 #' @title Classes igccatdist, igccatdistn, igcmatcatdist, igcmatcatdistn
 #' for positive (normalized) vectors and matrices.
+#' @description
+#' `igccatdist`, `igccatdistn`, `igcmatcatdist`, `igcmatcatdistn` are
+#' S3 classes for, respectively, positive vectors, probability distributions,
+#' positive matrices and stochastic matrices (positive matrices whose rows sum to one).
 #' @param p A numeric vector (for `igcatdist`, `igcatdistn`) or
 #' matrix (`igmatcatdist`, `igmatcatdistn`) of positive values.
 #'
@@ -186,6 +190,20 @@ jdiv.igccatdist <- function(p, q, base = exp(1)) {
   return(res)
 }
 
+#'@export
+jdiv.igcmatcatdist <- function(p, q = p, base = exp(1)) {
+  np <- nrow(p)
+  nq <- nrow(q)
+  sapply(1:np, function(x) {
+    sapply(1:nq, function(y) {
+      jdiv(p = igccatdist(p[x,]),
+           q = igccatdist(q[y,]))
+    })
+  }) -> res
+  t(res)
+}
+
+
 #' @export
 jsdiv.igccatdist <- function(p, q, base = exp(1)) {
   if (! ("igccatdist" %in% class(p) && "igccatdist" %in% class(q) && length(p) == length(q))) {
@@ -194,7 +212,18 @@ jsdiv.igccatdist <- function(p, q, base = exp(1)) {
   return((kldiv(p, (p+q)/2, base = base) + kldiv(q, (p+q)/2, base = base))*.5)
 }
 
-
+#'@export
+jsdiv.igcmatcatdist <- function(p, q = p, base = exp(1)) {
+  np <- nrow(p)
+  nq <- nrow(q)
+  sapply(1:np, function(x) {
+    sapply(1:nq, function(y) {
+      jsdiv(p = igccatdist(p[x,]),
+           q = igccatdist(q[y,]))
+    })
+  }) -> res
+  t(res)
+}
 
 ## Methods for computing centroids ----
 
@@ -255,11 +284,51 @@ jcent.igcmatcatdist <- function(p, weight = NULL, base = exp(1), lambda = 0, ...
 #' and normalized geometric centroids;
 #'  - "bsa" for a single-value binary search alogrithm based on Lagrangian optimization;
 #'  - "gbic" for the Gauss-Bregman inductive centroid.
-#' Default is "bsa". See Details section.
+#' Default is "gbic". See Details section.
 #' @param tol For `igcmatcatdistn` objects only. A positive value,
 #' the tolerance in the approximation of Jeffreys centroid. Default is 1e-8.
 #' @param ... Additionnal arguments for other methods.
-#' @seealso Generic function [jcent()]
+#' @seealso Generic function [jcent()], [jscent()] for computing Jensen-Shannon centroids
+#' @details
+#' Let \eqn{p_1, \cdots, p_n} denote the rows of `p` and
+#' \eqn{w_1, \cdots, w_n} the components of the vector `weight`.
+#' The output of `jcent()` is a numerical approximation of the
+#' probability distribution \eqn{p^*} (object of class `igccatdistn`) satisfying
+#' \deqn{p^* \in \textrm{Argmin} \left\{ \sum_{i=1}^n w_i \mathbb{J}(p_i:q) \ | \  q >= 0 \sum_{x} q(x) =1 \right\},}
+#' where \eqn{\mathbb{J}((p_i:q)} denotes the Jeffreys divergence between \eqn{p_i} and \eqn{q}.
+#' Nielsen (2013) establishes using Lagrangian multipliers method that \eqn{p^*} is of the form
+#' \deqn{p^*(x) = \frac{a(x)}{W( \exp( \log(b) (\lambda + 1)  a(x)/g(x)))},}
+#' where \eqn{W} denotes the Lambert function,
+#' \eqn{a = \sum w_i p_i} is the arithmetic centroid of the vectors \eqn{p_i},
+#' \eqn{g = \prod p_i^{w_i}} is their geometric centroid,
+#' \eqn{b >0} is the logarithm basis used to compute the Jeffreys divergence  and
+#' \eqn{\lambda} is the unique real number such that
+#' \deqn{\mathbb{K}(p^* | g) = - \lambda.}
+#' There is no known closed-form expression for \eqn{\lambda}.
+#'
+#' The argument `method` identifies the method to be used to compute a numerical approximation
+#' of \eqn{\lambda} or directly of \eqn{p^*}. More precisely, if:
+#'
+#'  - `method = "bsa"`, a numerical approximation of \eqn{\lambda} satisfying the last equation
+#'  is computed thanks to a binary search.
+#'  The argument `tol` refers to the numerical tolerance for this approximation.
+#'  Then, the corresponding probability distribution \eqn{p^*} is computed.
+#'  Due to the computational cost of evaluating the Lambert function,
+#'  this method can be timec-consuming,
+#'  particularly when the state space (i.e., the number of columns of `p`) is large;
+#'  - `method = "gbic"`, an iterative procedure called Gauss-Bregman inductive center
+#'  is performed; see Nielsen (2024).
+#'  It consists in iteratively computing arithmetic and geometric means
+#'  of centroids until convergence. It is by far computationally less expansive than "bsa",
+#'  with a similar quality of approximation.
+#'  Its excellent performances make it the default method used by `jcent()`;
+#'  - `method = "mag"`, the mean \eqn{(a+g)/2} of the arithmetic and geometric centroids is returned;
+#'  it corresponds to the first iteration of "gbic";
+#'  - `method = "jfr"`, the Fisher-Rao midpoint of
+#'  the arithmetic and geometric centroids is returned, i.e.,
+#'  the normalized version of \eqn{(\sqrt{a} +\sqrt{g})^2};
+#'  - `method = "njc"`, the normalized version of the positive vector Jeffreys centroid is returned.
+#'
 #' @references
 #'
 #' Nielsen, F. (2013). Jeffreys Centroids: A Closed-From Expresion for
@@ -283,7 +352,7 @@ jcent.igcmatcatdist <- function(p, weight = NULL, base = exp(1), lambda = 0, ...
 #' t(sapply(meths, function(m) jcent(p, method = m)))
 
 jcent.igcmatcatdistn <- function(p, weight = NULL, base = exp(1),
-                                 method = "bsa", tol = 1e-8, ...) {
+                                 method = "gbic", tol = 1e-8, ...) {
   # agm method: arithmetic mean of arithmetic and normalized geometric centroids
   if (method == "mag") {
     a <- arithcent.igcmatcatdist(p, weight = weight)
@@ -494,6 +563,19 @@ plot.igcmatcatdistn <- function(x, y = NULL, add = FALSE, pch = 20, ...) {
 
 points.igcmatcatdistn <- function(x, y = NULL, ...) {
   plot.igcmatcatdistn(x, add = TRUE, ...)
+}
+
+
+#' @rdname plot.igcmatcatdistn
+#' @export
+#' @examples
+#' p <- sample(1:10, size = 10L, replace = TRUE)
+#' p <- igccatdistn(p/sum(p))
+#' plot(p)
+plot.igccatdistn <- function(x, y = NULL, ...) {
+  dim(x) <- c(1,length(x))
+  x <- igcmatcatdistn(x)
+  plot.igcmatcatdistn(x, ...)
 }
 
 #' @rdname plot.igcmatcatdistn

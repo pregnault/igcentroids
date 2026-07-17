@@ -10,3 +10,7 @@ src/*.dll
 .DS_Store
 .quarto
 docs
+inst/doc
+**/.quarto/
+draft/*
+README_files/*

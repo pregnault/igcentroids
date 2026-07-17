@@ -1,7 +1,7 @@
 Package: igcentroids
-Title: Information geometry centroids for categorical distributions,
+Title: Information-geometric centroids for categorical distributions,
     positive arrays and more
-Version: 0.0.0.001
+Version: 0.0.0.002
 Authors@R: c(
     person("Philippe", "Regnault", , "philippe.regnault@univ-reims.fr", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0002-7086-9030")),
@@ -18,6 +18,10 @@ Roxygen: list(markdown = TRUE)
 Imports: 
     lamW (>= 2.2.7)
 Suggests:
-    testthat (>= 3.3.2)
+    knitr,
+    quarto,
+    testthat (>= 3.3.2),
+    doclisting (>= 0.1.0)
 LinkingTo: Rcpp
 Config/roxygen2/version: 8.0.0
+VignetteBuilder: quarto

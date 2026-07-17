@@ -4,7 +4,7 @@
 \name{igcentroids-package}
 \alias{igcentroids}
 \alias{igcentroids-package}
-\title{igcentroids: Information geometry centroids for categorical distributions, positive arrays and more}
+\title{igcentroids: Information-geometric centroids for categorical distributions, positive arrays and more}
 \description{
 This package implements several approximation algorithms of the symmetric Kullback-Leibler centroid, also called symmetrical Kullback-Leibler centroid or symmetrized Kullback-Leibler centroid, or Jeffreys centroidc.
 }

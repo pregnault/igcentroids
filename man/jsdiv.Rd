@@ -7,26 +7,53 @@
 jsdiv(p, q, base = exp(1))
 }
 \arguments{
-\item{p, q}{Two \strong{R} objects of same class. Currently, there is a method for
-\code{igccatdist} objects.}
+\item{p, q}{Two \strong{R} objects of same class. Currently, there are methods for
+\code{igccatdist} and \code{igcmatcatdist} objects.}
 
 \item{base}{A positive value specifying the base of logarithm used for
-computing Jeffreys divergence. Default is exp(1) (natural logarithm).}
+computing Jensen-Shannon divergence. Default is exp(1) (natural logarithm).}
 }
 \value{
-The value of (symmetric) the Jensen-Shannon divergence (or capacity discrimination)
-between \code{p} and \code{q}.
+\itemize{
+\item If \code{p} and \code{q} are \code{igccatdist} objects, returns the value of the
+Jensen-Shannon divergence between \code{p} and \code{q};
+\item if \code{p} and \code{q} are \code{igcmatcatdist} objects, returns a matrix of \code{nrow(p)} rows and
+\code{nrow(q)} columns whose coefficients are the Jensen-Shannon divergences
+from rows of \code{p} to rows of \code{q}.
+}
 }
 \description{
-Compute the Jensen-Shannon divergence between two probability with same support,
-i.e., the average of Kullback-Leibler divergences of probability distributions
-with respect to the mixture of them.
+\code{jsdiv()} is an S3 generic for computing the Jensen-Shannon divergence
+between probability distributions, i.e.,
+the average of Kullback-Leibler divergences of probability distributions
+with respect to the mixture of them. Methods exist for the following classes:
+\itemize{
+\item \code{igccatdist}
+\item \code{igcmatcatdist}
+}
 }
 \examples{
+# Compute the Jensen-Shannon (JS) divergence
+# between two probability distributions with common support.
 p <- igccatdist(dbinom(0:4, size = 4, prob = 0.5))
 q <- igccatdist(rep(1/5, times = 5))
 jsdiv(p, q)
+# Compute the (squared) matrix of JS divergences between
+# the elements of set of probabilily distributions
+p <- igccatdist(dbinom(0:4, size = 4, prob = 0.5))
+q <- igccatdist(rep(1/5, times = 5))
+r <- igccatdist(c(0.3, 0.4, 0.1, 0.1, 0.1))
+matp <- matrix(c(p, q, r), nrow = 3, byrow = TRUE)
+matptest <- igcmatcatdistn(p = matp)
+jsdiv(p = matptest)
+# Compute the matrix of JS divergences between
+# two sets of probability distributions
+matp2 <- matrix(c(dbinom(0:4, size = 5, prob = 0.3),
+                      c(0.1, 0.1, 0.2, 0.2, 0.4)),
+                    nrow = 2, byrow = TRUE)
+matptest2 <- igcmatcatdist(matp2)
+jsdiv(p = matptest, q = matptest2)
 }
 \seealso{
-\code{\link[=kldiv]{kldiv()}}, \code{\link[=jdiv]{jdiv()}}
+\code{\link[=kldiv]{kldiv()}}, \code{\link[=jdiv]{jdiv()}}, \link{catdist}.
 }
