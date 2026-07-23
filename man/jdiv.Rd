@@ -31,6 +31,14 @@ R objects, with methods for the following classes:
 \item \code{igcmatcatdist}
 }
 }
+\details{
+The Jeffreys divergence or symmetric Kullback-Leibler divergence
+is a symmetric and bounded discrimination measure between positive measures defined on
+a measurable space.
+It is formally defined, for \eqn{p} and \eqn{q} two positive measures with same support, by
+\deqn{\mathbb{J}(p,q) = \mathbb{K}\left(p: q \right) +  \mathbb{K}\left(q:p \right),}
+where \eqn{\mathbb{K}} denotes the Kullback-Leibler divergence; see \code{\link[=kldiv]{kldiv()}}.
+}
 \examples{
 # Compute the Jeffreys divergence
 # between two probability distributions with common support.

@@ -19,17 +19,34 @@ computing Jensen-Shannon divergence. Default is exp(1) (natural logarithm).}
 Jensen-Shannon divergence between \code{p} and \code{q};
 \item if \code{p} and \code{q} are \code{igcmatcatdist} objects, returns a matrix of \code{nrow(p)} rows and
 \code{nrow(q)} columns whose coefficients are the Jensen-Shannon divergences
-from rows of \code{p} to rows of \code{q}.
+between rows of \code{p} and rows of \code{q}.
 }
 }
 \description{
-\code{jsdiv()} is an S3 generic for computing the Jensen-Shannon divergence
-between probability distributions, i.e.,
-the average of Kullback-Leibler divergences of probability distributions
-with respect to the mixture of them. Methods exist for the following classes:
+\code{jsdiv()} is an S3 generic for computing the Jensen-Shannon divergence between
+R objects, with methods for the following classes:
 \itemize{
 \item \code{igccatdist}
 \item \code{igcmatcatdist}
+}
+}
+\details{
+The Jensen-Shannon divergence, also known as capacitory discrimination,
+is a symmetric and bounded discrimination measure between finite-mass positive measures defined on a
+measurable space.
+It is formally defined, for \eqn{p} and \eqn{q} two finite-mass positive measures, by
+\deqn{\mathbb{JS}(p,q) = \frac{1}{2} \left( \mathbb{K}\left(p: \frac{p+q}{2}  \right) +  \mathbb{K}\left(q: \frac{p+q}{2}  \right)\right),}
+where \eqn{\mathbb{K}} denotes the Kullback-Leibler divergence; see \code{\link[=kldiv]{kldiv()}}.
+
+For probability distributions (pds), it is linked to Shannon entropy \eqn{\mathbb{S}} through the relation
+\deqn{\mathbb{JS}(p,q) = \mathbb{S} \left( \frac{p+q}{2} \right) - \frac{\mathbb{S}(p) + \mathbb{S}(q)}{2}.}
+Properties of Jensen-Shannon divergence include:
+\itemize{
+\item definition for pds with distinct supports:
+\eqn{\mathbb{JS}(p,q)} is well-defined wether or not \eqn{p} and \eqn{q} have same support,
+\item symmetry: \eqn{\mathbb{JS}(p,q) = \mathbb{JS}(q,p)},
+\item boundedness: \eqn{\mathbb{JS}(p,q) \leq \log(2)}, with equality whenever
+supports of \eqn{p} and \eqn{q} are disjoint.
 }
 }
 \examples{

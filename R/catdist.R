@@ -295,7 +295,8 @@ jcent.igcmatcatdist <- function(p, weight = NULL, base = exp(1), lambda = 0, ...
 #' The output of `jcent()` is a numerical approximation of the
 #' probability distribution \eqn{p^*} (object of class `igccatdistn`) satisfying
 #' \deqn{p^* \in \textrm{Argmin} \left\{ \sum_{i=1}^n w_i \mathbb{J}(p_i:q) \ | \  q >= 0 \sum_{x} q(x) =1 \right\},}
-#' where \eqn{\mathbb{J}((p_i:q)} denotes the Jeffreys divergence between \eqn{p_i} and \eqn{q}.
+#' where \eqn{\mathbb{J}((p_i:q)} denotes the Jeffreys divergence between \eqn{p_i} and \eqn{q};
+#' see [jdiv()] for details.
 #' Nielsen (2013) establishes using Lagrangian multipliers method that \eqn{p^*} is of the form
 #' \deqn{p^*(x) = \frac{a(x)}{W( \exp( \log(b) (\lambda + 1)  a(x)/g(x)))},}
 #' where \eqn{W} denotes the Lambert function,

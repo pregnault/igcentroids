@@ -4,7 +4,7 @@
 \alias{jscent}
 \title{Jensen-Shannon centroid of categorical probability distributions.}
 \usage{
-jscent(p, weight = NULL, base = exp(1), ...)
+jscent(p, weight = NULL, base = exp(1), tol = 1e-08, ...)
 }
 \arguments{
 \item{p}{An object of class \code{igcmatcatdistn}, i.e.,
@@ -15,6 +15,9 @@ Default is NULL, yielding uniform weights on the rows of \code{p}.}
 
 \item{base}{A positive value, the base of the logarithm to be used
 to compute Jensen-Shannon divergence. Default is \code{exp(1)}.}
+
+\item{tol}{For \code{igcmatcatdistn} objects only. A positive value,
+the tolerance in the optimization procedure; see Details Section. Default is 1e-8.}
 
 \item{...}{Additionnal arguments for other methods.}
 }
@@ -32,7 +35,29 @@ with methods for the following classes:
 }
 }
 \details{
-Additional details...
+If input \code{p} is a stochastic matrix (object of class \code{igcmatcatdistn}),
+the output is the probability distribution minimizing the weighted mean of
+Jensen-Shannon divergences with the rows of \code{p}. More precisely,
+let \eqn{p_1, \cdots, p_n} denote the rows of \code{p} and
+\eqn{w_1, \cdots, w_n} the components of the vector \code{weight}.
+The output of \code{jscent()} is a numerical approximation of the
+probability distribution \eqn{p^*} (object of class \code{igccatdistn}) satisfying
+\deqn{p^* \in \textrm{Argmin} \left\{ \sum_{i=1}^n w_i \ \mathbb{JS}(p_i:q) \ | \  q >= 0,  \sum_{x} q(x) =1 \right\},}
+where \eqn{\mathbb{JS}(p_i:q)} denotes the Jensen-Shannon divergence between \eqn{p_i} and \eqn{q};
+see \code{\link[=jsdiv]{jsdiv()}} for details.
+
+This numerical approximation is obtained by the ConCave-Convexe Procedure (CCCP) introduced by
+Yuille and Rangarajan (2002), as stated in Nielsen (2020).
+It is an iterative optimization procedure for objective functions that can be written as
+the sum of two functions, one concave \eqn{B}, the other convex \eqn{A}.
+Starting from an initial pd \eqn{p^{(0)}} (the arithmetic centroid of rows of \code{p}),
+a sequence of pds \eqn{p^{(1)}, \cdots, p^{(r)}} is computed recursively
+through the formula
+\deqn{p^{(t+1)} = (\nabla B)^{-1} \left( \nabla A (p^{(t)})\right), \quad t =1, \cdots, r,}
+where \eqn{\nabla A} and \eqn{\nabla B} denote gradients of functions \eqn{A} and  \eqn{B}.
+The algorithm stops as soon as
+the norm-1 between \eqn{p^{(r)}} and \eqn{p^{(r-1)}} is less
+than the tolerance argument \code{tol} and outputs \eqn{p^{(r)}}.
 }
 \examples{
 p <- igccatdist(dbinom(0:4, size = 4, prob = 0.5))
@@ -43,6 +68,11 @@ matptest <- igcmatcatdistn(p = matp)
 jscent(matptest)
 }
 \references{
+Yuille, A.L., Rangarajan, A. (2001). The concave-convex procedure (CCCP).
+In Proceedings of the Neural Information Processing Systems 2001,
+Vancouver, BC, Canada, 9--14, December 2001, 1033-1040.
+\href{https://dl.acm.org/doi/10.5555/2980539.2980672}{doi:10.5555/2980539.2980672}
+
 Nielsen, F. (2020). On a Generalization of the Jensen-Shannon Divergence
 and the Jensen-Shannon Centroid.
 \emph{Entropy}, \strong{22}, 221--244.

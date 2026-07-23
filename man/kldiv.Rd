@@ -18,6 +18,18 @@ The value of the Kullback-Leibler divergence from \code{p} to \code{q}.
 \description{
 Compute the Kullback-Leibler divergence of a positive measure with respect to another dominating the first one.
 }
+\details{
+For any finite-mass positive measures \eqn{p} and \eqn{q} on a measurable space,
+such that \eqn{p} is dominated by \eqn{q} and both are dominated by some measure \eqn{\mu},
+the Kullback-Leibler divergence \eqn{\mathbb{K}(p:q)} from \eqn{p} to \eqn{q} is given by
+\deqn{\mathbb{K}(p:q) = \int p \log(p/q) \textrm{d} \mu - \int p \textrm{d} \mu +  \int q \textrm{d} \mu.}
+
+If \eqn{p} and \eqn{q} are probability distributions on a finite set \eqn{\mathcal{X}},
+the Kullback-Leibler divergence from \eqn{p} to \eqn{q} reduces to
+\deqn{\mathbb{K}(p:q) = \sum_{x \in \mathcal{X}} p(x) \log \frac{p(x)}{q(x)},}
+with the conventions \eqn{0 \log \frac{0}{0} = 0}, \eqn{0 \log \frac{0}{q} = 0} and
+\eqn{p \log \frac{p}{0} = \infty}.
+}
 \examples{
 p <- igccatdist(dbinom(0:4, size = 4, prob = 0.5))
 q <- igccatdist(rep(1/5, times = 5))

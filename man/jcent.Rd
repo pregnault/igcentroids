@@ -38,7 +38,8 @@ If input \code{p} is a positive matrix (object of class \code{igcmatcatdist}),
 jcent()\verb{returns the positive vector minimizing the weighted mean of Jeffreys divergences with the rows of}p\verb{. More precisely, by denoting \eqn{p_1, \cdots, p_n} the rows of }p\verb{and \eqn{w_1, \cdots, w_n} the components of the vector}weight\verb{, the output of jcent()} is
 the positive vector \eqn{p^*} satisfying
 \deqn{p^* \in \textrm{Argmin} \left\{ \sum_{i=1}^n w_i \mathbb{J}(p_i:q) \ | \  q \textrm{ pos. vector} \right\},}
-where \eqn{\mathbb{J}((p_i:q)} denotes the Jeffreys divergence between \eqn{p_i} and \deqn{q}.
+where \eqn{\mathbb{J}((p_i:q)} denotes the Jeffreys divergence between \eqn{p_i} and \deqn{q};
+see \code{\link[=jdiv]{jdiv()}} for details.
 The minimizer \eqn{p^*} has a closed-from expression given by
 \deqn{p^*(x) = \frac{a(x)}{W( \exp( \log(b) a(x)/g(x)))},}
 where \eqn{W} denotes the Lambert function,
@@ -46,7 +47,7 @@ where \eqn{W} denotes the Lambert function,
 \eqn{g = \prod p_i^{w_i}} is their geometric centroid and
 \eqn{b >0} is the logarithm basis used to compute the Jeffreys divergence.
 
-If input \code{p} is a stochastic matrix (object of class \code{igcmatcatdist}),
+If input \code{p} is a stochastic matrix (object of class \code{igcmatcatdistn}),
 the output is the probability distribution minimizing the weighted mean of
 Jeffreys divergences with the rows of \code{p}; formally,
 \deqn{p^* \in \textrm{Argmin} \left\{ \sum_{i=1}^n w_i \mathbb{J}(p_i:q) |  q >= 0 \sum_{x} q(x) =1 \right\}.}
