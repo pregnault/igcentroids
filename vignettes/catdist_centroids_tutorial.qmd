@@ -61,7 +61,8 @@ The subset $\mathcal{P}_1(\mathcal{X}) \subset \mathcal{P}(\mathcal{X})$ of posi
 # The binomial distribution of parameters n = 4 and p = 0.5 as an igccatdist object
 q <- igccatdistn(dbinom(x = 0:4, size = 4L, prob = 0.5))
 print(q)
-# Normalize a positive vecto priori to convert it to igccatdistn
+# Normalize a positive vector prior to convert it to igccatdistn
+p <- undo_igc(p) # Remove class igccatdist to retrieve a numeric vector
 igccatdistn(p/sum(p))
 ```
 

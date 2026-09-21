@@ -9,12 +9,12 @@
 
 
 new_igccatdist <- function(p) {
-  stopifnot(is.vector(p), is.numeric(p), length(p) > 0, all(p > 0))
+  stopifnot(is.numeric(p), length(p) > 0, all(p > 0))
   structure(p, class = "igccatdist", mass = sum(p))
 }
 
 new_igccatdistn <- function(p) {
-  stopifnot(is.vector(p), is.numeric(p), length(p) > 0, all(p > 0))
+  stopifnot(is.numeric(p), length(p) > 0, all(p > 0))
   structure(p / sum(p), class = c("igccatdistn", "igccatdist"), mass = sum(p))
 }
 
@@ -124,7 +124,7 @@ NULL
 #' @examples
 #' igccatdist(c(0.3, 0.1, 0.4, 0.8))
 igccatdist <- function(p = numeric()) {
-  p <- as.numeric(p)
+  # p <- as.numeric(p)
   validate_igccatdist(new_igccatdist(p))
 }
 
@@ -136,7 +136,7 @@ igccatdist <- function(p = numeric()) {
 #' p+q
 
 igccatdistn <- function(p = numeric()) {
-  p <- as.numeric(p)
+  # p <- as.numeric(p)
   validate_igccatdistn(new_igccatdistn(p))
 }
 
@@ -168,7 +168,61 @@ igcmatcatdistn <- function(p = numeric()) {
 }
 
 
-# Methods for classes igccatdist and igccatdistn ----
+# Methods for classes igccatdist, igccatdistn, ,igcmatcatdist and igcmacatdistn ----
+
+## Methods for basic manipulations ----
+
+### Bind several objects of classes igc with compatible sizes ----
+
+
+#' Bind positive matrices and vectors
+#'
+#' `bind_igc()` behaves for positive matrices and vectors as `base::rbind()` does for matrices:
+#' it binds the matrices if the numbers of columns are the same for all arguments.
+#' If all arugments are stochastic matrices or categorical distributions,
+#' the result is a stochastic matrix. Otherwise, it returns a positive matrix.
+#' @param ... The positive matrices and vectors to be binded.
+#' @export
+#' @examples
+#' # Bind positive matrices
+#' A <- igcmatcatdist(matrix(1:6, nrow = 2))
+#' B <- igcmatcatdistn(matrix(c(dbinom(0:2, size = 2, prob = 0.2),
+#' dbinom(0:2, size = 2, prob = 0.5)),
+#' nrow = 2, byrow = TRUE))
+#' bind_igc(A,B)
+#' # Bind positive matrices and vectors
+#' C <- igccatdist(7:9)
+#' D <- igccatdistn(dbinom(0:2, size = 2, prob = 0.7))
+#' bind_igc(A, B, C, D)
+#' # Returns a stochastic matrix when arguments are stochastic matrices or categorical distributions
+#' bind_igc(B, D)
+bind_igc <- function(...) {
+  dots <- list(...)
+  classdots <- lapply(dots, class)
+  if (!all(sapply(classdots,
+                  function(cl) length(base::intersect(c("igcmatcatdist", "igcmatcatdistn",
+                                                 "igccatdist", "igcatdistn"),
+                                               cl)) >= 1))) {
+    stop("All arguments must be objects coercible to the class igcmatcatdist.")
+  }
+  whichigccatdist <- sapply(classdots, function(cl) "igccatdist"%in% cl)
+  dots[whichigccatdist] <- lapply(dots[whichigccatdist], cat2mat)
+  ncoldots <- sapply(dots, ncol)
+  if (length(unique(ncoldots)) != 1) {
+    stop("Objects have incompatible sizes.")
+  }
+  z <- matrix(unlist(lapply(dots, function(x) as.numeric(t(undo_igc(x))))),
+              ncol = unique(ncoldots), byrow = TRUE)
+  if (all(sapply(classdots, function(cl)
+    length(base::intersect(c("igccatdistn", "igcmatcatdistn"), cl) >= 1)))
+  ) {
+    res <- igcmatcatdistn(z)
+  }
+  else {
+    res <- igcmatcatdist(z)
+  }
+  return(res)
+}
 
 ## Methods for computing divergences ----
 
@@ -177,7 +231,7 @@ kldiv.igccatdist <- function(p, q, base = exp(1)) {
   if (! ("igccatdist" %in% class(p) && "igccatdist" %in% class(q) && length(p) == length(q))) {
     stop("Arguments p and q must be igccatdist objects of same size")
   }
-  res <- sum(p * log(p / q, base = base) - p + q)
+  res <- sum(p * log(p / q, base = base) -p + q)
   return(res)
 }
 
@@ -209,7 +263,7 @@ jsdiv.igccatdist <- function(p, q, base = exp(1)) {
   if (! ("igccatdist" %in% class(p) && "igccatdist" %in% class(q) && length(p) == length(q))) {
     stop("Arguments p and q must be igccatdist objects of same size")
   }
-  return((kldiv(p, (p+q)/2, base = base) + kldiv(q, (p+q)/2, base = base))*.5)
+  return((kldiv(p,(p+q)/2, base = base) + kldiv(q, (p+q)/2, base = base))*.5)
 }
 
 #'@export
@@ -260,7 +314,7 @@ geomcent.igcmatcatdist <- function(p, weight = NULL, base = exp(1)) {
 jcent.igcmatcatdist <- function(p, weight = NULL, base = exp(1), lambda = 0, ...) {
   a <- arithcent.igcmatcatdist(p, weight = weight)
   g <- geomcent.igcmatcatdist(p, weight = weight, base = base)
-  res <- a * log(base) / lambertW0(a / g * exp(log(base) * (lambda + 1)))
+  res <- as.numeric(a * log(base) / lambertW0(a / g * exp(log(base) * (lambda + 1))))
   return(igccatdist(res))
 }
 
@@ -406,7 +460,7 @@ jcent.igcmatcatdistn <- function(p, weight = NULL, base = exp(1),
     res <- res / sum(res)
     attributes(res)$mass <- sum(res)
   }
-  return(igccatdistn(res))
+  return(igccatdistn(as.numeric(res)))
 }
 
 #' @export

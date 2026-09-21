@@ -66,6 +66,22 @@ test_that("jdiv with base different from exp(1) returns consistent results", {
   expect_equal(div2, div1 / log(2))
 })
 
+test_that("jvid applied to a couple of positive matrices returns the matrix of jdiv between rows of the first and second matrices", {
+  p <- igcmatcatdist(matrix(1:6, nrow = 2L, ncol = 3L))
+  q <- igcmatcatdist(matrix(1:12, nrow = 4L, ncol = 3L))
+  r <- jdiv(p, q)
+  expect_equal(dim(r), c(2, 4))
+  expect_equal(r[1,2], jdiv(igccatdist(c(1, 3, 5)), igccatdist(c(2, 6, 10))))
+})
+
+test_that("jdiv applied to a single positive matrix returns the matrix of jdiv between rows of the input matrix", {
+  p <- igcmatcatdist(matrix(1:6, nrow = 2L, ncol = 3L))
+  r <- jdiv(p)
+  expect_equal(dim(r), c(2, 2))
+  expect_equal(r[1,2], jdiv(igccatdist(c(1, 3, 5)), igccatdist(c(2, 4, 6))))
+  expect_equal(r[2,1], r[1,2])
+})
+
 ## Jensen-Shannon divergence ----
 
 test_that("jsdiv returns an error message if inputs p and q are not consistent", {
@@ -126,6 +142,22 @@ test_that("jsdiv equals the difference between the entropy of the mixture and th
   entsmix <- sapply(1:nrow(p), function(idrow) -sum((p[idrow,]*0.5+q[idrow,]*0.5)*log((p[idrow,]*0.5+q[idrow,]*0.5))))
   divsalt <- entsmix - entsp*0.5 - entsq*0.5
   expect_true(all.equal(divs, divsalt))
+})
+
+test_that("jsdiv applied to a couple of positive matrices returns the matrix of jdiv between rows of the first and second matrices", {
+  p <- igcmatcatdist(matrix(1:6, nrow = 2L, ncol = 3L))
+  q <- igcmatcatdist(matrix(1:12, nrow = 4L, ncol = 3L))
+  r <- jsdiv(p, q)
+  expect_equal(dim(r), c(2, 4))
+  expect_equal(r[1,2], jsdiv(igccatdist(c(1, 3, 5)), igccatdist(c(2, 6, 10))))
+})
+
+test_that("jsdiv applied to a single positive matrix returns the matrix of jdiv between rows of the input matrix", {
+  p <- igcmatcatdist(matrix(1:6, nrow = 2L, ncol = 3L))
+  r <- jsdiv(p)
+  expect_equal(dim(r), c(2, 2))
+  expect_equal(r[1,2], jsdiv(igccatdist(c(1, 3, 5)), igccatdist(c(2, 4, 6))))
+  expect_equal(r[2,1], r[1,2])
 })
 
 # Methods for computing centroids ----
@@ -189,6 +221,26 @@ test_that("geomcent returns an object of class igccatdist
   p <- igcmatcatdist(matrix(1:6, nrow = 2))
   expect_true(class(geomcent(p)) == "igccatdist")
 })
+
+test_that("Argument weight of geomcent is a positive vector", {
+  p <- igcmatcatdistn(matrix(c(dbinom(0:4, size = 4, prob = 0.5),
+                               dbinom(0:4, size = 4, prob = 0.3)),
+                             nrow = 2, byrow = TRUE))
+  weight <- c(-1, 1)
+  expect_error(geomcent(p, weight = weight))
+  weight <- 3
+  expect_error(geomcent(p, weight = weight))
+})
+
+test_that("Argument weight of geomcent is invariant by scalar multiplication", {
+  p <- igcmatcatdistn(matrix(c(dbinom(0:4, size = 4, prob = 0.5),
+                               dbinom(0:4, size = 4, prob = 0.3)),
+                             nrow = 2, byrow = TRUE))
+  weight1 <- c(2, 2)
+  weight2 <- c(10, 10)
+  expect_equal(geomcent(p, weight = weight1), geomcent(p, weight = weight2))
+})
+
 
 ## Jeffreys centroid ----
 
@@ -291,6 +343,17 @@ test_that("jscent method for igcmatcatdistn has a mandatory argument 'tol'
             expect_contains(class(jscent(p = p, tol = 1e-16)), "igccatdistn")
           })
 
+test_that("Argument weight of jscent is a positive vector", {
+  p <- igcmatcatdistn(matrix(c(dbinom(0:4, size = 4, prob = 0.5),
+                               dbinom(0:4, size = 4, prob = 0.3)),
+                             nrow = 2, byrow = TRUE))
+  weight <- c(-1, 1)
+  expect_error(jscent(p, weight = weight))
+  weight <- 3
+  expect_error(jscent(p, weight = weight))
+})
+
+
 # Plot methods ----
 
 ## Plot objects of class igcmatcatdistn ----
@@ -345,4 +408,21 @@ test_that("Categorical distributions with more than three states are drawn as po
   res_plot <- plot(p)
   expect_match(tolower(res_plot$type), regexp = "polyline")
 })
+
+
+test_that("Methods points for igccatdistn and igcmatcatdistn add points to a pre-existing chart", {
+            set.seed(987)
+            matp <- matrix(c(1/3, 1/3, 1/3,
+                             0.9, 0.05, 0.05,
+                             0.1, 0.45, 0.45,
+                             0.6, 0.25, 0.15),
+                           nrow = 4L, byrow = TRUE)
+            p <- igcmatcatdistn(matp)
+            res_plot <- plot(p)
+            matq <- bind_igc(arithcent(p),
+                             geomcent(p))
+            r <- jscent(p)
+            expect_no_error(points(matq))
+            expect_no_error(points(r))
+          })
 

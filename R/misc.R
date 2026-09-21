@@ -32,7 +32,7 @@
 #'
 binarysearch <- function(lb, ub, fun, tol = 1e-8) {
   if (fun(lb) * fun(ub) > 0 | fun(lb) > fun(ub) ) {
-    stop("Function fun must be strictly monotone,
+    stop("Function fun must be strictly increasing,
           with 0 belonging between the images by fun of
           lower and upper bound lb and up.")
   }
@@ -42,14 +42,14 @@ binarysearch <- function(lb, ub, fun, tol = 1e-8) {
   if (isTRUE(all.equal(fun(ub), 0, tolerance = tol))) {
     return(list(sol = ub, prec = 0, iter = 0))
   }
-  if (fun(lb) < 0 && fun(ub) > 0) {
+  # if (fun(lb) < 0 && fun(ub) > 0) {
     lba <- lb
     uba <- ub
-  }
-  else {
-    lba <- ub
-    uba <- lb
-  }
+  # }
+  # else {
+  #   lba <- ub
+  #   uba <- lb
+  # }
   # From there, fun is assumed to be a continusous strictly
   # increasing function with fun(lba) <0 and fun(uba) >0
   cpt <- 0
@@ -61,6 +61,21 @@ binarysearch <- function(lb, ub, fun, tol = 1e-8) {
   res <- (uba + lba) / 2
   err <- (uba - lba) / 2
   return(list(sol = res, prec = err, iter = cpt))
+}
+
+# Basic manipulations of objects of classes igc... ----
+
+## Convert igccatdist to igcmatcatdist
+
+cat2mat <- function(x) {
+  y <- undo_igc(x)
+  dim(y) <- c(1, length(y))
+  if ("igccatdistn" %in% class(x)) {
+    igcmatcatdistn(y)
+  }
+  else {
+    igcmatcatdist(y)
+  }
 }
 
 # Support functions for computing jensen-shannon centroids of categorical distributions ----

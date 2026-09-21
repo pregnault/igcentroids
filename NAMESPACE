@@ -16,6 +16,7 @@ S3method(points,igccatdistn)
 S3method(points,igcmatcatdistn)
 export(arithcent)
 export(binarysearch)
+export(bind_igc)
 export(geomcent)
 export(igccatdist)
 export(igccatdistn)
@@ -31,10 +32,12 @@ export(jsdiv)
 export(jsdivflex)
 export(kldiv)
 export(undo_igc)
-importFrom(graphics,axis)
-importFrom(graphics,lines)
-importFrom(graphics,plot.new)
-importFrom(graphics,plot.window)
-importFrom(graphics,points)
-importFrom(graphics,segments)
+importFrom(graphics,
+  axis,
+  lines,
+  plot.new,
+  plot.window,
+  points,
+  segments
+)
 importFrom(lamW,lambertW0)
