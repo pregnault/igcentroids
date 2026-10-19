@@ -360,11 +360,15 @@ test_that("Argument weight of jscent is a positive vector", {
 
 test_that("Method plot for class igcmatcatdistn unable to perform plot
           for matrices with only one column", {
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
   p <- igcmatcatdistn(matrix(rep(1, 10L), nrow = 10L))
   expect_error(plot(p))
 })
 
 test_that("Method plot for class igcmatcatdistn returns invisibly an object", {
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
   set.seed(987)
   p <- igcmatcatdistn(matrix(sample(1:10, size = 20L, replace = TRUE), nrow = 10L))
   expect_invisible(plot(p))
@@ -375,6 +379,8 @@ test_that("Method plot for class igcmatcatdistn returns invisibly an object", {
 })
 
 test_that("Two-state categorical distributions are drawn as points on a segment", {
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
   set.seed(987)
   p <- igcmatcatdistn(matrix(sample(1:10, size = 20L, replace = TRUE), nrow = 10L))
   res_plot <- plot(p)
@@ -382,6 +388,8 @@ test_that("Two-state categorical distributions are drawn as points on a segment"
 })
 
 test_that("Three-state categorical distributions are drawn as points in an equilateral triangle", {
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
   set.seed(987)
   p <- igcmatcatdistn(matrix(sample(1:10, size = 30L, replace = TRUE), nrow = 10L))
   res_plot <- plot(p)
@@ -390,6 +398,8 @@ test_that("Three-state categorical distributions are drawn as points in an equil
 
 test_that("Three-state categorical distributions are properly transformed
           into coordinates in the equilateral triangle", {
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
   set.seed(987)
   matp <- matrix(c(1/3, 1/3, 1/3,
                    0.9, 0.05, 0.05,
@@ -404,6 +414,8 @@ test_that("Three-state categorical distributions are properly transformed
 
 test_that("Categorical distributions with more than three states are drawn as polylines.", {
   set.seed(987)
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
   p <- igcmatcatdistn(matrix(sample(1:10, size = 50L, replace = TRUE), nrow = 10L))
   res_plot <- plot(p)
   expect_match(tolower(res_plot$type), regexp = "polyline")
@@ -411,18 +423,20 @@ test_that("Categorical distributions with more than three states are drawn as po
 
 
 test_that("Methods points for igccatdistn and igcmatcatdistn add points to a pre-existing chart", {
-            set.seed(987)
-            matp <- matrix(c(1/3, 1/3, 1/3,
-                             0.9, 0.05, 0.05,
-                             0.1, 0.45, 0.45,
-                             0.6, 0.25, 0.15),
-                           nrow = 4L, byrow = TRUE)
-            p <- igcmatcatdistn(matp)
-            res_plot <- plot(p)
-            matq <- bind_igc(arithcent(p),
-                             geomcent(p))
-            r <- jscent(p)
-            expect_no_error(points(matq))
-            expect_no_error(points(r))
-          })
+  pdf(NULL)
+  on.exit(dev.off(), add = TRUE)
+  set.seed(987)
+  matp <- matrix(c(1/3, 1/3, 1/3,
+                   0.9, 0.05, 0.05,
+                   0.1, 0.45, 0.45,
+                   0.6, 0.25, 0.15),
+                 nrow = 4L, byrow = TRUE)
+  p <- igcmatcatdistn(matp)
+  res_plot <- plot(p)
+  matq <- bind_igc(arithcent(p),
+                   geomcent(p))
+  r <- jscent(p)
+  expect_no_error(points(matq))
+  expect_no_error(points(r))
+})
 
