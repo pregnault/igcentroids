@@ -288,7 +288,7 @@ jcent(mat2, # default corresponds to method = "gbic"
       tol = 1e-8) # tol controls state-by-state approximation error.
 ```
 
-Package `igcentroids` (version 0.1.0) covers the  computation of Jensen-Shannon centroids only for probability distributions. A numerical approximation of $c_{\mathbb{JS}}^{(1)}$ is obtained by the ConCave-Convexe Procedure (CCCP) introduced by [@yuilleandrangarajan2003], as stated in [@nielsen2020]. See the documentation of the function `jscent()` for details. 
+Package `igcentroids` (version 0.0.1.0) covers the  computation of Jensen-Shannon centroids only for probability distributions. A numerical approximation of $c_{\mathbb{JS}}^{(1)}$ is obtained by the ConCave-Convexe Procedure (CCCP) introduced by [@yuilleandrangarajan2003], as stated in [@nielsen2020]. See the documentation of the function `jscent()` for details. 
 
 ```{r}
 #| label: cpt-jscentpd

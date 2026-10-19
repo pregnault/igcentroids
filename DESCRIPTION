@@ -1,7 +1,7 @@
 Package: igcentroids
 Title: Information-geometric centroids for categorical distributions,
     positive arrays and more
-Version: 0.0.0.002
+Version: 0.0.1.0
 Authors@R: c(
     person("Philippe", "Regnault", , "philippe.regnault@univ-reims.fr", role = c("cre", "aut"),
            comment = c(ORCID = "0000-0002-7086-9030")),
@@ -21,7 +21,8 @@ Suggests:
     knitr,
     quarto,
     testthat (>= 3.3.2),
-    doclisting (>= 0.1.0)
+    doclisting (>= 0.1.0),
+    flexclust
 LinkingTo: Rcpp
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1
 VignetteBuilder: quarto
