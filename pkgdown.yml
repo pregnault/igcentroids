@@ -1,0 +1,9 @@
+pandoc: 3.8.3
+pkgdown: 2.2.1
+pkgdown_sha: ~
+articles:
+  catdist_centroids_tutorial: catdist_centroids_tutorial.html
+last_built: 2026-10-19T16:22Z
+urls:
+  reference: https://pregnault.github.io/igcentroids/reference
+  article: https://pregnault.github.io/igcentroids/articles
