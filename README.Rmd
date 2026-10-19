@@ -98,16 +98,18 @@ res_clust <- kcca(x = sampsimp, k= 4, family = jfam)
 plot(sampsimp, col = res_clust@cluster+1)
 ```
 
-We can compute the Jeffreys divergences between the pds and the centroid of their clusters.
+We can compute the Jeffreys divergences between the pds and the centroids of the clusters.
 
 ```{r jdivtocent, eval = TRUE, echo = TRUE}
-cents <- igcmatcatdist(res_clust@centers) # Centroids
+cents <- igcmatcatdistn(res_clust@centers) # Centroids
 clusters <- split(1:nrow(sampsimp), res_clust@cluster)
 jdiv2cents <- list(4)
 for (i in 1:4) {
   jdiv2cents[[i]] <- jdiv(p = igcmatcatdistn(sampsimp[clusters[[i]],]), 
                           q = cents)
+  colnames(jdiv2cents[[i]]) <- paste0("Centroid_", 1:4)
 }
+names(jdiv2cents) <- paste0("Cluster_", 1:4)
 jdiv2cents
 
 ```

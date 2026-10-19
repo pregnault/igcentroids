@@ -45,7 +45,7 @@ probability distribution \eqn{p^*} (object of class \code{igccatdistn}) satisfyi
 where \eqn{\mathbb{J}((p_i:q)} denotes the Jeffreys divergence between \eqn{p_i} and \eqn{q};
 see \code{\link[=jdiv]{jdiv()}} for details.
 Nielsen (2013) establishes using Lagrangian multipliers method that \eqn{p^*} is of the form
-\deqn{p^*(x) = \frac{a(x)}{W( \exp( \log(b) (\lambda + 1)  a(x)/g(x)))},}
+\deqn{p^*(x) = \frac{a(x)}{W( \exp( \log(b) (\lambda + 1))  a(x)/g(x))},}
 where \eqn{W} denotes the Lambert function,
 \eqn{a = \sum w_i p_i} is the arithmetic centroid of the vectors \eqn{p_i},
 \eqn{g = \prod p_i^{w_i}} is their geometric centroid,
