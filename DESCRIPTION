@@ -23,6 +23,5 @@ Suggests:
     testthat (>= 3.3.2),
     doclisting (>= 0.1.0),
     flexclust
-LinkingTo: Rcpp
 Config/roxygen2/version: 8.1.1
 VignetteBuilder: quarto
