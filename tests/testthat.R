@@ -9,4 +9,7 @@
 library(testthat)
 library(igcentroids)
 
+# Force l'utilisation d'un périphérique virtuel en arrière-plan
+options(device = function(...) pdf(file = NULL))
+
 test_check("igcentroids")
