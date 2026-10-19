@@ -20,9 +20,23 @@ These procedures fully integrate into a clustering-task workflow performed with 
 As a preliminary step, load the package `{igcentroids}`, as follows.
 
 ```{r}
-#| label: setup
+#| label: setup-exe
+#| echo: false
+#| eval: true
+if (Sys.getenv("R_CMD_CHECK_LOCAL_LIBS") != "") {
+  .libPaths(c(Sys.getenv("R_CMD_CHECK_LOCAL_LIBS"), .libPaths()))
+}
+
 library(igcentroids)
 ```
+```{r}
+#| label: setup-display
+#| echo: true
+#| eval: false
+library(igcentroids)
+
+```
+
 
 It is implicitly assumed that the package `{igcentroids}` has been previously installed; if not, please, refer to the [README](https://github.com/pregnault/igcentroids) file on top of the repository of the package.
 
