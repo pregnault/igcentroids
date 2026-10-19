@@ -1,5 +1,5 @@
 ---
-title: "Informational geometrical centroids of categorical distributions"
+title: "Information-geometric centroids of categorical distributions"
 vignette: >
   %\VignetteIndexEntry{catdist_centroids_tutorial}
   %\VignetteEngine{quarto::html}
@@ -8,12 +8,14 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
-# bibliography: bib_vignette_catdist_igcentroids.bib
+bibliography: bib_vignette_catdist_igcentroids.bib
 ---
 
-This tutorial is intended to assist the user in getting started with calculating centroids of discrete probability distributions relative to the Jeffreys and Jensen-Shannon divergences with the package `{igcentroids}` and integrating these computation in a clustering-task workflow. 
-It starts with a short, technical presentation of the underlying S3 classes of R objects the package is built upon, in @sec-vig_catdist_presclasses. The informational geometric theoretical foundation of the ensueing procedures is outlined in Setions [-@sec-vig_catdist_presdivergences] and [-@sec-vig_catdist_prescentroids]. More precisely, the definitions and properties of Kullback-Leibler (KL), Jeffreys (J) and Jensen-Shannon (JS) divergences (div) and related centroids are reviewed; the usage of methods for computing them is also illustrated. 
-These procedures fully integrate into a clustering-task workflow performed with the package `{flexclust}`, as illustrated in @sec-vig_catdist_clustering. Finally, full examples of such clustering tasks are presented in @sec-vig_catdist_fullexamples.
+This tutorial is intended to assist the user in getting started with calculating centroids of discrete (probability) distributions relative to the Jeffreys and Jensen-Shannon divergences with the package `{igcentroids}` and integrating these computation in a clustering-task workflow. 
+It starts with a short, technical presentation of the underlying S3 classes of R objects the package is built upon, in @sec-vig_catdist_presclasses. 
+The information-geometric theoretical foundation of the ensueing procedures is outlined in Setions [-@sec-vig_catdist_presdivergences] and [-@sec-vig_catdist_prescentroids]. More precisely, the definitions and properties of Kullback-Leibler (KL), Jeffreys (J) and Jensen-Shannon (JS) divergences (div) and related centroids are reviewed; the usage of methods for computing them is also illustrated. 
+These procedures fully integrate into a clustering-task workflow performed with the package `{flexclust}`, as illustrated in @sec-vig_catdist_clustering. 
+<!-- Finally, full examples of such clustering tasks are presented in @sec-vig_catdist_fullexamples. -->
 
 As a preliminary step, load the package `{igcentroids}`, as follows.
 
@@ -25,11 +27,11 @@ library(igcentroids)
 It is implicitly assumed that the package `{igcentroids}` has been previously installed; if not, please, refer to the [README](https://github.com/pregnault/igcentroids) file on top of the repository of the package.
 
 
-## S3 classes `igccatdist`, `igccatdistn`, `igcmatcatdist` and `igcmatcatdistn` {#ssec-vig_catdist_presclasses}
+## S3 classes `igccatdist`, `igccatdistn`, `igcmatcatdist` and `igcmatcatdistn` {#sec-vig_catdist_presclasses}
 
 `{igcentroids}` provides several procedures for clustering categorical -- or finite-state space -- (probability) distributions with same support. 
 
-We formally denote $\mathcal{P}(\mathcal{X})$ the set of positive measures -- or categorical distributions -- on the finite set $\mathcal{X} = \{x_1, \cdots, x_d\}$. Such a measure $\mu$ is mathematically identifiable to the vector $(\mu(x_1), \cdots, \mu(x_d)) \in \mathbb{R}^d$ with  $\mu(x_i) >0$  for all $i \i \{1, \cdots, d\}$; it is represented in `{igcentroids}` as an object of S3 class `igccatdist` built upon classical numeric vectors. Such an object is obtained as the output of the eponyme constructor function `igccatdist()`, taking a positive numeric vector as input.
+We formally denote $\mathcal{P}(\mathcal{X})$ the set of positive measures -- or categorical distributions -- on the finite set $\mathcal{X} = \{x_1, \cdots, x_d\}$. Such a measure $\mu$ is mathematically identifiable to the vector $(\mu(x_1), \cdots, \mu(x_d)) \in \mathbb{R}^d$ with  $\mu(x_j) >0$  for all $j \in \{1, \cdots, d\}$; it is represented in `{igcentroids}` as an object of S3 class `igccatdist` built upon classical numeric vectors. Such an object is obtained as the output of the eponyme constructor function `igccatdist()`, taking a positive numeric vector as input.
 
 ```{r}
 #| label: creating_igccatdist_object
@@ -58,7 +60,8 @@ The subset $\mathcal{P}_1(\mathcal{X}) \subset \mathcal{P}(\mathcal{X})$ of posi
 
 ```{r}
 #| label: creating_igccatdistn_object
-# The binomial distribution of parameters n = 4 and p = 0.5 as an igccatdist object
+# The binomial distribution of parameters 
+# n = 4 and p = 0.5 as an igccatdist object
 q <- igccatdistn(dbinom(x = 0:4, size = 4L, prob = 0.5))
 print(q)
 # Normalize a positive vector prior to convert it to igccatdistn
@@ -76,15 +79,34 @@ matncd <- matrix(c(p/sum(p), q), nrow = 2, byrow = TRUE)
 igcmatcatdistn(matncd)
 ```
 
-Methods for generics plot() and points() associated to `igccatdistn` and `igcmatcatdistn` are available. Their behaviour depends on the size $|\mathcal{X}|$ of the support $\mathcal{X}$. More precisely, Two-state and three-state supports benefit of particular representations, for mere of pedagogical purpose, as illustrated by Figures [-@fig-23statencdplot-1] and [-@fig-23statencdplot-2].
+The function `bind_igc()` eases the creation of `igcmatcatdist` or `igcmatcatdistn` objects by binding together objects of classes `igc...`. Here are some examples, the class of output depending on whether all inputs are normalized or not.
+
+```{r}
+#| label: binding-igc-objs
+# binding objects of classes igcmatcatdist and igcmatcatdistn
+# results in an igcmatcatdist object.
+matcd <- igcmatcatdist(matcd)
+matncd <- igcmatcatdistn(matncd)
+bind_igc(matcd, matncd)
+# Add a row to an igcmatcatdist object
+r <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+bind_igc(matcd, r)
+# Add a row to an igcmatcatdistn object
+s <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.3))
+bind_igc(matncd, s)
+
+```
+
+
+Methods for generics `plot()` and `points()` associated to `igccatdistn` and `igcmatcatdistn` are available. Their behaviour depends on the size $|\mathcal{X}|$ of the support $\mathcal{X}$. More precisely, Two-state and three-state supports benefit of particular representations, for mere of pedagogical purpose, as illustrated by Figures [-@fig-23statencdplot-1] and [-@fig-23statencdplot-2].
 
 ```{r}
 #| layout-ncol: 2
 #| label: fig-23statencdplot
-#| fig-cap: Examples of representations of normalized categorical distributions obtained with the methods `plot()` and `points()` for `igcmatcatdistn` objects.
+#| fig-cap: Examples of representations of categorical probability distributions obtained with the methods `plot()` and `points()` for `igcmatcatdistn` objects.
 #| fig-subcap:
-#|   - Two-state ncds are represented as points on a unite segment.
-#|   - Three-state ncds are represented as points in the 2D simplex identified to the equilateral triangle.
+#|   - Two-state probability distributions are represented as points on a unite segment.
+#|   - Three-state probability distributions are represented as points in the 2D simplex identified to the equilateral triangle.
 # Two-state  categorical distributions plot
 u <- c(0.5, 0.5)
 p1 <- c(0.3, 0.7)
@@ -104,11 +126,11 @@ sampsimp <- runifsimplex(n = 32L)
 plot(sampsimp)
 ```
 
-Nprmalized categorical distributions with bigger state spaces are represented as polylines i.e., continuous piecewise linear functions linking the top of bars in a classical barplot; see @fig-plotbigstatespacencd.
+Categorical probability distributions with bigger state spaces are represented as polylines i.e., continuous piecewise linear functions linking the top of bars in a classical barplot; see @fig-plotbigstatespacencd.
 
 ```{r}
 #| label: fig-plotbigstatespacencd
-#| fig-cap: To be continued
+#| fig-cap: The barplot of a 10-state space probability distribution presented as a polyline.
 p <- sample(1:10, size = 10L, replace = TRUE)
 p <- igccatdistn(p/sum(p))
 plot(p)
@@ -118,13 +140,246 @@ plot(p)
 
 ## Computing divergences of a couple of categorical distributions {#sec-vig_catdist_presdivergences}
 
+Divergence functionals constitute a primal notion of information theory and related fields. 
+Among them, the Kullback-Leibler (KL) divergence of two positive measures is of special theoretical and practical importance due to its axiomatic, structural and geometric properties ; see, e.g [@amari2016]. 
+<!-- DEVELOPPER QUELQUES PROPRIETES ? -->
+The KL divergence $\mathbb{K}(p|q)$ of a couple $(p, q) \in \mathcal{P}(\mathcal{X})^2$ of positive measures with same support is given by
+$$
+\mathbb{K}(p|q) := \sum_{x \in \mathcal{X}} p(x) \log \frac{p(x)}{q(x)} - \sum_{x \in \mathcal{X}} p(x) + \sum_{x \in \mathcal{X}} q(x).
+$$ {#eq-defkldivposvec}
+Altought it is not a proper mathematical distance due to lack of symmetry and triangular inequality, its numerous properties make it a relevant measure of discrepancy between positive measures. First of all, $\mathbb{K}(p | q) \geq 0$ for any couple $(p, q)$ and $\mathbb{K}(p | q)  = 0$ if and only if $p = q$.
+
+Restricted to the set of couples of probability distributions, the two former sums in @eq-defkldivposvec cancel and the KL divergence simplifies to
+$$
+\mathbb{K}(p|q) = \sum_{x \in \mathcal{X}} p(x) \log \frac{p(x)}{q(x)}, \quad p, q \in \mathcal{P}_1(\mathcal{X}).
+$$
+The KL divergence of two positive measures can be computed thanks to the function `kldiv()` of `{igcentroids}`:
+```{r}
+#| label: cpt-kldiv-posvec
+set.seed(987)
+# KL div for positive vectors
+p <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+q <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+kldiv(p, q)
+kldiv(q, p) # KL is not symmetric
+# KL div for prob. dist.
+p <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.3))
+q <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.5))
+kldiv(p, q)
+```
+
+To overcome the lack of symmetry -- that appears to be a serious disagreement for the use of KL divergence for clustering purpose -- several symmetrizations have been proposed in the litterature [@nielsen2019entropy]. The Jeffreys and Jensen-Shannon divergences are the two most notable such symmetrizations. 
+Jeffreys divergence of a couple of positive vectors, introduced in [@jeffreys1946] is the sum of KL divergences of the couple $(p,q)$ and its chiral version $(q,p)$:
+$$
+\mathbb{J}(p, q) := \mathbb{K}(p | q) + \mathbb{K}(q | p) = \sum_{x \in \mathcal{X}} (p(x) -q(x)) \log \frac{p(x)}{q(x)}.
+$$
+It is extensively used in machine and deep learning as a loss function [@bousquetrouvier2023], [@nguyenetal2017], [@nielsen2013] and in signal processing [@griveletal2018].
+<!-- DEVELOPPER. -->
+
+Jensen-Shannon (JS) divergence [@lin1991], whose first appearance dates back to [@wong1985], is the average of KL-divergences from each vector $p$ and $q$ with respect to their arithmetic mean; more precisely,
+$$
+\mathbb{JS}(p, q) := \frac{1}{2} \left( \mathbb{K}\left((p \Big| \frac{p+q}{2} \right) +  \mathbb{K}\left( q \Big| \frac{p+q}{2} \right) \right).
+$$
+Besides its symmetry, JS divergence satisfies additionnal properties that make it relevant in numerous applications: it can be defined for categorical distributions with distinct supports, it always lies between $0$ and $\frac{1}{2}(p(\mathcal{X}) + q(\mathcal{X}))\log(2)$ where $p(\mathcal{X})$ and $q(\mathcal{X})$ denote the total weight of the state space $\mathcal{X}$ ($p(\mathcal{X}) = \sum_{x} p(x)$) -- this upper bound being achieved when the supports $p$ and $q$ are disjoint, and it can be expressed as the diferrence between the Shannon entropy of the arithmetic mean of $p$ and $q$ and the arithmetic mean of their Shannon entropies. Finally, the square root of $\mathbb{JS}$ define a proper euclidean metric on $\mathcal{P}(\mathcal{X})$; see [@endresandschindelin2003].
+
+Jeffreys and JS divergences of two positive vectors or categorical distributions can be computed thanks to the functions `jdiv()` and `jsdiv()` in `{igcentroids}`. 
+
+```{r}
+#| label: cpt-jjsdivposvects
+#| echo: true
+#| eval: true
+set.seed(587)
+# Jeffreys and JS divs for positive vectors
+p <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+q <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+jdiv(p, q)
+jsdiv(p, q)
+# Jeffreys and JS divs for prob. dist.
+p <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.3))
+q <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.5))
+jdiv(p, q)
+jsdiv(p,q)
+# Both are symmetric
+all.equal(jdiv(q,p), jdiv(p,q))
+all.equal(jsdiv(q,p), jsdiv(p,q))
+```
+
+Methods of `jdiv()` and `jsdiv()` for positive matrices and stochastic matrices are also provided, applying the above functions to all combinations of the rows of the two input matrices and formatting the output as a numeric matrix.
+
+```{r}
+#| label: cpt-jjsdivposmat
+#| echo: true
+#| eval: true
+mat1 <- bind_igc(p, q)
+r <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.4))
+s <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.2))
+t <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.1))
+mat2 <- bind_igc(r, s, t)
+jdiv(mat1, mat2)
+jsdiv(mat1, mat2)
+```
+The second matrix input of `jdiv()` and `jsdiv()` is optional; if not provided, it is implictly assumed to be equal to the first one, making obvious the computation of the "distance" matrix of a set of positive vectors or categorical distributions -- which can further be used as input of classical R functions for clustering; see @sec-vig_catdist_clustering.
+
+```{r}
+#| label: cpt-jjsdivsetcd
+#| echo: true
+#| eval: true
+jdiv(mat2)
+jsdiv(mat2)
+```
+
+
+
 ## Computing centroids of a set of categorical distributions {#sec-vig_catdist_prescentroids}
+
+Given a set $\{p^{(1)}, \cdots, p^{(n)}\} \subseteq \mathcal{P}(\mathcal{X})$ of $n$ positive vectors of size $d$ assorted with weights 
+$\omega_1, \cdots, \omega_n$, the Jeffreys and Jensen-Shannon centroids $c_{\mathbb{J}} = c_{\mathbb{J}}(p^{(1)}, \cdots, p^{(n)})$ and $c_{\mathbb{JS}} = c_{\mathbb{JS}}(p^{(1)}, \cdots, p^{(n)})$ are defined by
+$$
+c_{\mathbb{J}}  :=  \textrm{Argmin}_{p \in \mathcal{P}(\mathcal{X})} \sum_{i=1}^n \omega_i \mathbb{J}(p, p^{(i)}),
+$${#eq-defcentroids1}
+and 
+$$
+c_{\mathbb{JS}}  :=  \textrm{Argmin}_{p \in \mathcal{P}(\mathcal{X})} \sum_{i=1}^n \omega_i \mathbb{JS}(p, p^{(i)}).
+$$ {#eq-defcentroids2}
+The opmitization set in the definitions (-@eq-defcentroids1) and (-@eq-defcentroids2) is restricted to the set of probability distributions $\mathcal{P}_1(\mathcal{X})$ when  $p^{(1)}, \cdots, p^{(n)}$ are probability distributions; we denote $c_{\mathbb{J}}^{(1)}$ and $c_{\mathbb{JS}}^{(1)}$ such centroids of probability distributions so as to avoid confusion on the optimization set under study.
+
+@nielsen2013 establishes an explicit analytic formula for Jeffreys centroid of positive vectors; precisely, it is given by
+$$c_{\mathbb{J}}(x) = \frac{a(x)}{\mathrm{W}\left( \frac{a(x)}{g(x)} e \right) }, \quad x \in \mathcal{X},$$
+where $a$ and $g$ denote respectively the arithmetic and geometric centroids given by
+$$
+a(x) = \sum_{i=1}^n \omega_i p^{(i)}(x), \quad g(x) = \prod_{i=1}^n p^{(i)}(x)^{\omega_i}, \quad x \in \mathcal{X},
+$$
+and $\mathrm{W}$ is the branch $\mathrm{W_0}$ of the Lambert function, implicitly defined by $\mathrm{W}(x)\exp(\mathrm{W}(x)) = x$ for $x \geq 0$; see [@nielsen2013] for details.
+This closed form of Jeffreys centroid of positive vectors is returned by the method `jcent()` associated with the class `igcmatcatdist`. It returns an object of class `igccatdist`, as illustrated in the following chunk.
+
+```{r}
+#| label: cpt-cfjeffreyscentposvec
+#| echo: true
+#| eval: true
+set.seed(986)
+p <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+q <- igccatdist(sample(1:10, size = 5L, replace = TRUE))
+jcent(bind_igc(p,q))
+```
+
+Note that the function `lambertW0()` of the package `{lamW}` is used in the backend to compute the Lambert function. Note also that dedicated functions `arithcent()` and `geomcent()` allows for computing arithmetic and geometric centroids of positive vectors.
+
+No closed form expression is known for Jeffreys centroid of probability distributions. Five methods are implemented in `{igcentroids}` to compute approximated values, as made explicit in the documentation of the method `jcent()` for `igcmatcatdistn` objects. In short, the argument `method` of `jcent()` identifies the numerical method to be performed by a character string. 
+The approximation returned by  `jcent()` for  `method = "bsa"` relies on the expression of $c_{\mathbb{J}}^{(1)}$ derived by the Lagrangian method in [@nielsen2013]:
+$$
+c_{\mathbb{J}^{(1)}}(x) = \frac{a(x)}{\mathrm{W}\left( \frac{a(x)}{g(x)} \exp(\lambda +1) \right)}, \quad x \in \mathcal{X},
+$$
+where $\lambda \leq 0$ is such that $c_{\mathbb{J}}^{(1)} \in \mathcal{P}_{1}(\mathcal{X})$, with no explicit expression for it. The value of $\lambda$ is then approximated by a binary-search algorithm (bsa). 
+
+```{r}
+#| label: cpt-bsajeffreyscentpd
+r <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.4))
+s <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.2))
+t <- igccatdistn(dbinom(0:4, size = 4L, prob = 0.1))
+mat2 <- bind_igc(r, s, t)
+jcent(mat2, method = "bsa",
+      tol = 1e-8) # Precision of the bsa is controlled by tol
+```
+Due to the numerous evaluations of the Lambert function involved in bsa method, this method can be computationnaly expensive, particularly for large state spaces $\mathcal{X}$. An alternative approach consists in iteratively computing arithmetic and geometric means of centroids until convergence. This method, refered to as Gauss-Bregman inductive centering (gbic), has an informational geometric foundation, relying on the dually flat structure of $\mathcal{P}_1(\mathcal{X})$ induced by KL divergence; see @nielsen2024.  Its excellent performances make it the default method used by `jcent()`. Three other methods are also provided, for sake of completeness and comparison purposes. 
+
+```{r}
+#| label: cpt-gbicjeffreyscentpd
+jcent(mat2, # default corresponds to method = "gbic"
+      tol = 1e-8) # tol controls state-by-state approximation error.
+```
+
+Package `igcentroids` (version 0.1.0) covers the  computation of Jensen-Shannon centroids only for probability distributions. A numerical approximation of $c_{\mathbb{JS}}^{(1)}$ is obtained by the ConCave-Convexe Procedure (CCCP) introduced by [@yuilleandrangarajan2003], as stated in [@nielsen2020]. See the documentation of the function `jscent()` for details. 
+
+```{r}
+#| label: cpt-jscentpd
+jscent(mat2)
+```
+
 
 ## Clustering categorical distributions {#sec-vig_catdist_clustering}
 
-## Full examples {#sec-vig_catdist_fullexamples}
+`{igcentroids}` provides functions for an easy integration of these methods for clustering tasks
+using the package `{flexclust}`, as illustrated by the following chunk and @fig-jjsclustering.
 
-Categorical distributions, normalized or not, can be used to summarize a large variety of types of data, including categorical traits of sub-groups of a population, colors or gray intensities of pixels or voxels of 2D or 3D images, semantic contents of texts, etc. AJOUTER REFS. 
+```{r}
+#| label: fig-jjsclustering
+#| echo: true
+#| eval: true
+#| layout-ncol: 2
+#| fig-cap: $k$-medoids clustering performed on a set of 32 randomly generated probaiblity distributions on a three-state space, using Jeffreys and Jensen-Shannon divergences and centroids as measures of dissimarity and centers of classes.
+#| fig-subcap:
+#|  - Clustering with Jeffreys divergence.
+#|  - Clustering with Jensen-Shannon divergence. 
+library("flexclust")
+# Set jclust family: clustering based on 
+# Jeffreys divergence and centroids
+# Functions jdivflex(), jcentflex() and undo_igc()
+# are included in {igcentroids}
+# DO NOT MODIFY the following instruction
+jfam <- kccaFamily(name = "jclust",
+                   dist = jdivflex,
+                   cent = jcentflex,
+                   preproc = undo_igc)
+# The same for Jensen-Shannon divergence and centroids
+jsfam <- kccaFamily(name = "jsclust",
+                   dist = jsdivflex,
+                   cent = jscentflex,
+                   preproc = undo_igc)
+# Generate a set of random probability distributions
+# Three-state categorical distributions plot
+runifsimplex <- function(n = 1L) {
+  x <- runif(n)
+  y <- runif(n, min = 0, max = 1-x)
+  res <- igcmatcatdistn(matrix(c(x,y, 1-x-y), ncol = 3, byrow = FALSE))
+  return(res)
+}
+set.seed(527)
+sampsimp <- runifsimplex(n = 32L)
+# Operate clustering
+res_jeffreys_clust <- kcca(x = sampsimp, 
+                           k= 4, # Number of clusters
+                           family = jfam)  
+# Operate clustering
+res_js_clust <- kcca(x = sampsimp, 
+                     k= 4, # Number of clusters
+                     family = jsfam)  
+# Visualize Jeffreys clusters
+plot(sampsimp, col = res_jeffreys_clust@cluster+1)
+# Add centroids of clusters
+points(igcmatcatdistn(res_jeffreys_clust@centers), 
+       pch = 4, 
+       col = 2:5)
+# Visualize Jensen-Shannon clusters
+plot(sampsimp, col = res_js_clust@cluster+1)
+# Add centroids of clusters
+points(igcmatcatdistn(res_js_clust@centers), 
+       pch = 4, 
+       col = 2:5)
+
+
+```
+We can compute the divergences between the probability distributions and the centroids of the cluster, as illustrated below for the Jeffreys clustering.
+
+```{r}
+#| label: cpt-divtocent
+cents <- igcmatcatdistn(res_jeffreys_clust@centers) # Centroids
+clusters <- split(1:nrow(sampsimp), res_jeffreys_clust@cluster)
+jdiv2cents <- list(4)
+for (i in 1:4) {
+  jdiv2cents[[i]] <- jdiv(p = igcmatcatdistn(sampsimp[clusters[[i]],]), 
+                          q = cents)
+  colnames(jdiv2cents[[i]]) <- paste0("Centroid_", 1:4)
+}
+names(jdiv2cents) <- paste0("Cluster_", 1:4)
+jdiv2cents
+
+```
+
+
+
+<!-- ## Full examples {#sec-vig_catdist_fullexamples} -->
+
+<!-- Categorical distributions, normalized or not, can be used to summarize a large variety of types of data, including categorical traits of sub-groups of a population, colors or gray intensities of pixels or voxels of 2D or 3D images, semantic contents of texts, etc. AJOUTER REFS.  -->
 
 
 ## References {-}
